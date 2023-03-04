@@ -31,7 +31,7 @@
         ></v-text-field>
         <div>
             <v-btn class="w-100 mt-4" prepend-icon="mdi-account-circle">登入</v-btn>
-            <v-btn class="w-100 mt-4" prepend-icon="mdi-account-multiple-plus-outline">註冊</v-btn>
+            <v-btn class="w-100 mt-4" prepend-icon="mdi-account-multiple-plus-outline" @click="$router.push('/login/register')">註冊</v-btn>
         </div>
     </div>
 </template>
