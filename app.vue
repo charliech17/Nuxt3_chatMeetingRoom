@@ -28,9 +28,11 @@
 </template>
 
 <script lang="ts" setup>
-import { useDark,useToggle } from '@vueuse/core'
-const isDark = useDark()
-useToggle(isDark);
+import { firebaseInit } from '@/utils/firebase/firebaseInit'
+
+const app  = firebaseInit()
+//TODO firbase auth
+
   // import { io } from "socket.io-client";
   // import { Peer } from "peerjs";
 
