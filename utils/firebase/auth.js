@@ -7,20 +7,24 @@ import {
     updateProfile,
     sendPasswordResetEmail,
 } from "firebase/auth";
+import { useAuthStore } from '@/stores/authStore';
 
 
 // @ 註冊用戶
-export const registorWithMailAndPwd = () => {
+export const registorWithMailAndPwd = async (email,password) => {
     const auth = getAuth();
     createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
         // Signed in 
         const user = userCredential.user;
+        // TODO remove user console
+        console.log(userCredential,'userCredential')
         // ...
     })
     .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
+        alert(errorCode+' ' + errorMessage)
         // ..
     })
 }
@@ -38,11 +42,12 @@ export const verifyEmail = () => {
 
 
 // @ 登入用戶
-export const loginWithMailAndPwd = () => {
+export const loginWithMailAndPwd = (email, password) => {
     const auth = getAuth();
     signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
         // Signed in 
+        console.log(userCredential)
         const user = userCredential.user;
         // ...
     })
@@ -58,13 +63,24 @@ export const getUserAuthState = () => {
     const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
         if (user) {
-          // User is signed in, see docs for a list of available properties
-          // https://firebase.google.com/docs/reference/js/firebase.User
-            const uid = user.uid;
+            // User is signed in, see docs for a list of available properties
+            // https://firebase.google.com/docs/reference/js/firebase.User
+            // const uid = user.uid;
+            const userInfoObj = {
+                uid:user.uid,
+                email:user.email,
+                displayName:user.displayName
+            }
+            useAuthStore().toggleAuthState(true)
+            useAuthStore().updateLoginInfo(userInfoObj)
+            // TODO remove user console
+            console.log(user,'isLogin',useAuthStore().isAuth)
           // ...
         } else {
-          // User is signed out
-          // ...
+            useAuthStore().toggleAuthState(false)
+            console.log('notLogin',useAuthStore().isAuth)
+            // User is signed out
+            // ...
         }
     })
 }

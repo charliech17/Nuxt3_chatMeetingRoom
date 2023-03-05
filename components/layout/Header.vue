@@ -9,7 +9,11 @@
                     chatApp
                 </v-app-bar-title>
                 <template v-slot:append>
-                    <v-btn icon="mdi-account-circle" v-if="isLogin"></v-btn>
+                    <v-btn 
+                        icon="mdi-account-circle" 
+                        @click="isShowUserInfo = !isShowUserInfo" 
+                        v-if="isLogin"
+                    />
                     <v-btn 
                         v-else
                         variant="tonal" 
@@ -31,14 +35,44 @@
                 :items="navigatorItmes"
                 ></v-list>
             </v-navigation-drawer>
+            <v-navigation-drawer
+                v-model="isShowUserInfo"
+                class="userInfo_drawer"
+                temporary
+                location="right"
+            >
+                <template v-slot:prepend>
+                    <!-- TODO 更換頭像 title -->
+                    <v-list-item
+                        lines="two"
+                        prepend-avatar="https://randomuser.me/api/portraits/women/81.jpg"
+                        title="yourName"
+                        subtitle="Logged in"
+                    />
+                </template>
+                <v-divider></v-divider>
+                <v-list density="compact" nav>
+                    <v-list-item prepend-icon="mdi-home-city" title="Home" value="home"/>
+                    <v-list-item prepend-icon="mdi-account" title="My Account" value="account"/>
+                    <v-list-item prepend-icon="mdi-logout" title="Logout" value="logout"/>
+                </v-list>
+            </v-navigation-drawer>
         </v-layout>
+        <div class="userInfoDrawer">
+            
+        </div>
     </div>
 </template>
 
 <script setup>
+    import { useAuthStore } from '@/stores/authStore'
+    
+    
     const isShowDrawer    = ref(false)
+    const isShowUserInfo  = ref(false)
     const navigatorItmes  = reactive([])
-    const isLogin         = ref(false)
+    const isLogin         = computed(() => useAuthStore().isAuth)
+
 </script>
 
 <style lang="scss" scoped>
@@ -46,6 +80,11 @@
         :deep(.v-navigation-drawer__scrim) {
             background-color: lightgray;
             opacity: 0.5;
+        }
+
+        
+        :deep(.userInfo_drawer){
+            height: fit-content !important;
         }
     }
 </style>
