@@ -1,6 +1,7 @@
 <template>
     <div>
         <v-text-field
+            v-model="inputEmail"
             :rules="emailRules('login')"
             type="email"
             placeholder="範例: xxx@example.com"
@@ -11,6 +12,7 @@
             @update:model-value="(inputTxt)=> handleAccountInput(inputTxt)"
         ></v-text-field>
         <v-text-field
+            v-model="inputOTP"
             type="number"
             clearable
             label="OTP驗證碼"
@@ -21,6 +23,7 @@
             </template>
         </v-text-field>
         <v-text-field
+            v-model="inputPassword"
             :rules="passwordValid('login')"
             type="password"
             clearable
@@ -30,7 +33,7 @@
             @update:model-value="(inputTxt)=> handlePasswordInput(inputTxt)"
         ></v-text-field>
         <div>
-            <v-btn class="w-100 mt-4" prepend-icon="mdi-account-circle">登入</v-btn>
+            <v-btn class="w-100 mt-4" prepend-icon="mdi-account-circle" @click="loginUser">登入</v-btn>
             <v-btn class="w-100 mt-4" prepend-icon="mdi-account-multiple-plus-outline" @click="$router.push('/login/register')">註冊</v-btn>
         </div>
     </div>
@@ -38,12 +41,26 @@
 
 <script setup lang="ts">
     import { emailRules, passwordValid} from '@/utils/login/inputValidation'
+    import { loginWithMailAndPwd } from '@/utils/firebase/auth'
 
-    function handleAccountInput(inputTxt: string) {
+    const inputEmail = ref('')
+    const inputPassword = ref('')
+    const inputOTP = ref('')
+
+    function handleAccountInput(inputTxt: string) {}
+
+    function handlePasswordInput(inputTxt: string) {}
+
+    async function loginUser() {
+        if(inputOTP.value !== '123456') {
+            // TODO　實作OTP
+            alert('OTP 輸入錯誤')
+            return
+        }
+
+        await apiService(() => loginWithMailAndPwd(inputEmail.value,inputPassword.value))
     }
 
-    function handlePasswordInput(inputTxt: string) {
-    }
 </script>
 
 <style lang="scss" scoped>
