@@ -54,7 +54,7 @@
                 <v-list density="compact" nav>
                     <v-list-item prepend-icon="mdi-home-city" title="Home" value="home"/>
                     <v-list-item prepend-icon="mdi-account" title="My Account" value="account"/>
-                    <v-list-item prepend-icon="mdi-logout" title="Logout" value="logout"/>
+                    <v-list-item prepend-icon="mdi-logout" title="Logout" value="logout" @click="logoutUser"/>
                 </v-list>
             </v-navigation-drawer>
         </v-layout>
@@ -66,12 +66,18 @@
 
 <script setup>
     import { useAuthStore } from '@/stores/authStore'
-    
+    import { signOutUser } from '@/utils/firebase/auth'
     
     const isShowDrawer    = ref(false)
     const isShowUserInfo  = ref(false)
     const navigatorItmes  = reactive([])
     const isLogin         = computed(() => useAuthStore().isAuth)
+
+    const logoutUser = async () => {
+        await signOutUser()
+        isShowUserInfo.value = false
+        useRouter().replace('/')
+    }
 
 </script>
 

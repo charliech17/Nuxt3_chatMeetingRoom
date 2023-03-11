@@ -24,6 +24,23 @@ export function getRTDBData(readPath:string): Promise<object | null | Error> {
     });
 }
 
+//  @ 確認DB有無資料
+export function checkIsRTDBData(readPath:string): Promise<boolean | Error> {
+  const dbRef = FireBaseRef(getDatabase());
+  return get(child(dbRef, DB_SERCET + readPath))
+    .then((snapshot) => {
+      if (snapshot.exists()) {
+        return true
+      } else {
+        // No data available
+        return false
+      }
+    })
+    .catch((error) => {
+      throw new Error(error)
+    });
+}
+
 
 // @ 監聽資料更新
 export function listenSpecifyDataChange(readPath:string,callBack: Function) {

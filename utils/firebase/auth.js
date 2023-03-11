@@ -1,19 +1,14 @@
-import { 
-    getAuth, 
-    createUserWithEmailAndPassword, 
-    sendEmailVerification,
-    signInWithEmailAndPassword, 
-    onAuthStateChanged, 
-    updateProfile,
-    sendPasswordResetEmail,
-} from "firebase/auth";
+import { getAuth } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { updateProfile, sendEmailVerification, sendPasswordResetEmail } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useAuthStore } from '@/stores/authStore';
 
 
 // @ 註冊用戶
 export const registorWithMailAndPwd = async (email,password) => {
     const auth = getAuth();
-    createUserWithEmailAndPassword(auth, email, password)
+    return createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
         // Signed in 
         const user = userCredential.user;
@@ -25,6 +20,7 @@ export const registorWithMailAndPwd = async (email,password) => {
         const errorCode = error.code;
         const errorMessage = error.message;
         alert(errorCode+' ' + errorMessage)
+        throw new Error(error)
         // ..
     })
 }
@@ -42,18 +38,21 @@ export const verifyEmail = () => {
 
 
 // @ 登入用戶
-export const loginWithMailAndPwd = (email, password) => {
+export const loginWithMailAndPwd = async (email, password, callBack) => {
     const auth = getAuth();
-    signInWithEmailAndPassword(auth, email, password)
+    return signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
         // Signed in 
         console.log(userCredential)
         const user = userCredential.user;
+        callBack()
         // ...
     })
     .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
+        alert(errorMessage + ' ' +errorCode)
+        throw new Error(error)
     });
 }
 
@@ -145,5 +144,19 @@ export const resetPwd = () => {
         const errorCode = error.code;
         const errorMessage = error.message;
         // ..
+    });
+}
+
+
+// @ 登出使用者
+export const signOutUser = () => {
+    const auth = getAuth();
+    return signOut(auth).then(() => {
+        useAuthStore().$reset()
+    }).catch((error) => {
+        // TODO An error happened.
+        console.log(error)
+        alert(error)
+        throw new Error(error)
     });
 }
