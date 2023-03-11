@@ -63,7 +63,12 @@
             return 
         }
         
-        await apiService(() => registorWithMailAndPwd(emailAccount.value,initPassword.value))
+        await apiService(() => {
+            return registorWithMailAndPwd(emailAccount.value,initPassword.value)
+                    .then(() => {
+                        useRouter().replace('/room')
+                    })
+        })
     }
 </script>
 

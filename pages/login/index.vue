@@ -58,7 +58,8 @@
             return
         }
 
-        await apiService(() => loginWithMailAndPwd(inputEmail.value,inputPassword.value))
+        const router = useRouter()
+        await apiService(() => loginWithMailAndPwd(inputEmail.value,inputPassword.value,()=> router.push('/room')))
     }
 
 </script>
