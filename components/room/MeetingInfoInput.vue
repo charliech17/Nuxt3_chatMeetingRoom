@@ -1,12 +1,12 @@
 <template>
     <main>
         <div>
-            <label class="mr-4" for="roomName">
+            <label class="mr-4" for="roomCode">
                 <slot name="meetingCode"></slot>
             </label>
             <BaseInput
-                @emitInputVal="(val)=> roomName = val"
-                name="roomName"
+                @emitInputVal="(val)=> roomCode = val"
+                name="roomCode"
                 type="number"
             />
         </div>
@@ -29,23 +29,28 @@
 </template>
 
 <script lang="ts" setup>
-    import { getRTDBData, setRTDBData } from '@/utils/firebase/useRTDB'
+    import { checkIsRTDBData, setRTDBData } from '@/utils/firebase/useRTDB'
     import { useAuthStore } from '@/stores/authStore'
 
     const props = defineProps({
         isFrom: {type: String, required: true},
     })
 
-    const roomName = ref('')
+    const roomCode = ref('')
     const roomPassword = ref('')
 
     const handleMeetingJoin = async () => {
         if(props.isFrom === 'host') {
-            const newMeetingPath = 'room/' + roomName.value + "/"
+            const newMeetingPath = 'room/' + roomCode.value + "/"
             const hostPath       = 'host/' + useAuthStore().uid + "/"//+ new Date().getTime() + "/"
-            const isHost     = await getRTDBData(hostPath)
-            const isRoomData = await getRTDBData(newMeetingPath)
-            if(isHost) {
+            const isHost     = await checkIsRTDBData(hostPath)
+            const isRoomData = await checkIsRTDBData(newMeetingPath)
+            if(roomCode.value.length < 6  && roomPassword.value.length < 4) {
+                // TODO 換成較UI套件
+                alert('請確認會議代碼至少6碼，會議密碼至少4碼')
+                return
+            }
+            else if(isHost) {
                 // TODO 換成較UI套件
                 alert('您已有會議')
                 return
@@ -56,7 +61,7 @@
             } else {
                 // TODO 改成UUID套件，加上會議名稱、主持人名稱
                 const updateMeetingInfo = { 
-                    uuid: useAuthStore().uid, 
+                    uuidList: [useAuthStore().uid], 
                 }
                 const hostMeetingInfo = {
                     createTime: new Date().toString(), 
