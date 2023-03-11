@@ -14,11 +14,12 @@
             </button>
         </section>
         <section class="mt-4">
-            <RoomMeetingInfoInput v-if="isShowSetting">
+            <RoomMeetingInfoInput :isFrom="'host'" v-if="isShowSetting">
                 <template v-slot:meetingCode>設定會議代碼</template>
                 <template v-slot:meetingPassword>設定會議密碼</template>
+                <template v-slot:meetingBtn>開始會議</template>
             </RoomMeetingInfoInput>
-            <RoomMeetingInfoInput v-if="isShowInput">
+            <RoomMeetingInfoInput :isFrom="'guest'" v-if="isShowInput">
                 <template v-slot:meetingCode>輸入會議代碼</template>
                 <template v-slot:meetingPassword>輸入會議密碼</template>
             </RoomMeetingInfoInput>

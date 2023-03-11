@@ -3,6 +3,7 @@
         class="shadow border rounded py-2 px-3 text-white-700W focus:outline-none focus:shadow-outline"
         name="roomName" 
         :type="type"
+        v-model="inputVal"
         @input="handleInput"
         @change="handleChange"
     >
@@ -15,9 +16,10 @@
         name: {type: String, required: false},
     })
     
+    const inputVal = ref('')
 
     // emit
-    const emit = defineEmits(['input', 'change'])
+    const emit = defineEmits(['input', 'change','emitInputVal'])
 
 
     // method
@@ -27,6 +29,7 @@
 
     function handleChange() {
         emit('change')
+        emit('emitInputVal',inputVal.value)
     }
     
 </script>
