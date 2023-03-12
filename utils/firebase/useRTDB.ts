@@ -56,7 +56,12 @@ export function listenSpecifyDataChange(readPath:string,callBack: Function) {
 // @ 將資料寫入RTDB
 export function setRTDBData(writePath: string, writeData: object) {
   const db = getDatabase();
-  return set(FireBaseRef(db, DB_SERCET + writePath), writeData).then((data)=> {console.log(data)});
+  return set(FireBaseRef(db, DB_SERCET + writePath), writeData)
+          .then((data)=> {console.log(data)})
+          .catch((err) => {
+            alert(err)
+            throw new Error(err)
+          });
 }
 
 
