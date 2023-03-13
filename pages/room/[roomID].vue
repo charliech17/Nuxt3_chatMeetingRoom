@@ -1,7 +1,8 @@
 <template>
     <div>
         <p>{{ 'hello  ' + $route.path }}</p>
-        <div>
+        <p>{{ '是否連接' + isConnect }}</p>
+        <div id="insertVideo">
             <video 
                 id="myVideo" 
                 ref="myMedia_display"
@@ -15,18 +16,21 @@
 
 
 <script lang="ts" setup>
-    import { checkIsRTDBData, getRTDBData } from '@/utils/firebase/useRTDB'
+    import { checkIsRTDBData, getRTDBData, setRTDBData } from '@/utils/firebase/useRTDB'
     import { getUserMedia } from '@/utils/baseUtils'
     import { useAuthStore } from '@/stores/authStore'
     import { Peer } from "peerjs";
     import { initPeerSettings } from '@/utils/peerjsUtils'
 
+
     // TODO encrypt 會議名稱 & pass
     // TODO　將function抽出來寫
+    const isConnect = ref(false)
     const roomPathSplit = useRoute().path.split('_')
     const baseRoomURL   = roomPathSplit[0] + "/" + roomPathSplit[1]
     const checkRoomPath = baseRoomURL + '/isRoom'
     const userRoomPath  = baseRoomURL + '/uuidList'
+
 
     // @ 檢查是否有該房間
     const checkIsRoomValid = async () => {
@@ -40,48 +44,88 @@
     checkIsRoomValid()
 
 
-    // @  載入影像
-    const myMedia_display = ref<HTMLVideoElement|null>(null)
-    onMounted(()=> {
-        nextTick(async ()=> {
-            const constraints = {
-                audio: true,
-                video: { facingMode: "user" },
-            }
-            const callBackFunction = (stream: MediaStream) => {
-                const myVideo = myMedia_display.value as HTMLVideoElement | null
-                if(myVideo) {
-                    myVideo.srcObject = stream;
-                }
-            }
-            await getUserMedia(constraints,callBackFunction)
-            const roomUserList =  await apiService(()=> getRTDBData(userRoomPath))
-            
-            console.log(roomUserList[0])
-        })
-    })
-
-
-    // @ peer settings
-    // TODO peer call 時增加別人影像
+    // @  初始化peer
     const connectUID: ComputedRef<string | null> = computed(() => useAuthStore().uid) 
+    const myMedia_display = ref<HTMLVideoElement|null>(null)
+    let myStream: undefined | MediaStream;
     let peer: any
-    console.log(connectUID,'connect!!!!')
-    watch(connectUID, (newValue) => {
-        if(newValue) {
-            console.log(connectUID,'connect!!!!')
-            // @ts-ignore
-            peer = new Peer(connectUID.value)
-            initPeerSettings({peer})
+
+    const initPeer = () => {
+        if(connectUID.value) {
+            startPeer()
+        } else {
+            watch(connectUID,(newValue)=> {
+                if(newValue) {
+                    startPeer()
+                }
+            })
         }
-    })
+    }
+
+    
+    const startPeer = async () => {
+        if(!connectUID.value) return
+
+        const onOpenCallBack = () => {
+            isConnect.value = true
+            
+            nextTick(async ()=> {
+                const constraints = {
+                    audio: true,
+                    video: { facingMode: "user" },
+                }
+                const callBackFunction = (stream: MediaStream) => {
+                    const myVideo = myMedia_display.value as HTMLVideoElement | null
+                    if(myVideo) {
+                        myStream = stream
+                        myVideo.srcObject = stream;
+                    }
+                    listenPeerEvent({peer,localStream:stream})
+                }
+                await getUserMedia(constraints,callBackFunction)
+
+                const roomUserList =  await apiService(()=> getRTDBData(userRoomPath))
+                addToUUID_List(roomUserList)
+            })
+        }
+        peer = new Peer(connectUID.value)
+        initPeerSettings({peer,onOpenCallBack})
+    }
+    initPeer()
+
+
+    // @  加入uuidList
+    // const roomUserList =  await apiService(()=> getRTDBData(userRoomPath))
+    const addToUUID_List = async (roomUserList: {[uuid:string]: string}) => {
+        const isInList =  Object.values(roomUserList).find((uuid) => uuid === connectUID.value)
+        if(!isInList) {
+            const uuidListLength = Object.values(roomUserList).length
+            const newList = {...roomUserList,[uuidListLength]: connectUID.value}
+            await apiService(()=> setRTDBData(userRoomPath,newList))
+            callAllOtherUser(newList)
+        }
+    }
+
 
     // @ call function
     // TODO call other的邏輯處理
     const callAllOtherUser = (roomUserList: {[uuid:string]: string}) => {
-        Object.keys(roomUserList).forEach((uuid: string) => {
-            if(roomUserList[uuid] !== useAuthStore().uid) return
+        console.log(roomUserList,'roomUserList!!@@##')
+        Object.values(roomUserList).forEach((uuid: string) => {
+            if(uuid === useAuthStore().uid) return
+            
+            const call = peer.call(uuid, myStream)
+            call.on("stream", (remoteStream:MediaStream) => {
+                const newVideo = document.createElement("video");
+                newVideo.setAttribute('autoplay','')
+                newVideo.setAttribute('muted','')
+                newVideo.setAttribute('playsinline','')
+                newVideo.srcObject = remoteStream
 
+                console.log('newVideo',newVideo)
+                const insertElement = document.getElementById('insertVideo')
+                insertElement?.appendChild(newVideo)
+            })
         }) 
     }
     
