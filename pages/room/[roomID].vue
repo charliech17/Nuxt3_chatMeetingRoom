@@ -109,23 +109,28 @@
 
     // @ call function
     // TODO call other的邏輯處理
+    const tempSaveStreamID: string[] = []
     const callAllOtherUser = (roomUserList: {[uuid:string]: string}) => {
         console.log(roomUserList,'roomUserList!!@@##')
         Object.values(roomUserList).forEach((uuid: string) => {
             if(uuid === useAuthStore().uid) return
-            
+
             const call = peer.call(uuid, myStream)
             call.on("stream", (remoteStream:MediaStream) => {
+                const hasStream = tempSaveStreamID.find((id)=> id === remoteStream.id)
+                if(hasStream) return
+
+                tempSaveStreamID.push(remoteStream.id)
                 const newVideo = document.createElement("video");
                 newVideo.setAttribute('autoplay','')
                 newVideo.setAttribute('muted','')
                 newVideo.setAttribute('playsinline','')
                 newVideo.srcObject = remoteStream
 
-                console.log('newVideo',newVideo)
                 const insertElement = document.getElementById('insertVideo')
                 insertElement?.appendChild(newVideo)
             })
+
         }) 
     }
     

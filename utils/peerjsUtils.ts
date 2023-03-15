@@ -35,35 +35,38 @@ export const listenPeerEvent = ({peer,dataReciveCallBack, onConnectionCallBack, 
 
     //  @ 自己裝置關閉peer連線
     peer.on('close', function() { 
-        
+        console.log('close')
     });
     
     //  @ 自己裝置斷線
     peer.on('disconnected', function() { 
-        
+        console.log('disconnected')
     })
 
     //  @ 發生錯誤
-    peer.on('error',(error: Error)=> {
-
+    peer.on('error',(error: any)=> {
+        console.log('connection error',error,error.type)
     })
 }
 
-
+const tempSaveStreamID: string[] = []
 export const baseOnCallFunction = (call: any, localStream: MediaStream | undefined) => {
     call.answer(localStream);
     call.on("stream", (remoteStream: MediaStream,insertID: string) => {
+        const hasStream = tempSaveStreamID.find((id)=> id === remoteStream.id)
+        if(hasStream) return
+
+        tempSaveStreamID.push(remoteStream.id)
         const newVideo = document.createElement("video");
         newVideo.setAttribute('autoplay','')
         newVideo.setAttribute('muted','')
         newVideo.setAttribute('playsinline','')
         newVideo.srcObject = remoteStream
 
-        console.log('newVideo',newVideo)
         const insertElement = document.getElementById('insertVideo')
         insertElement?.appendChild(newVideo)
-
     })
+
 }
 
 //  ################## type ##################  //
