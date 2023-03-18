@@ -20,7 +20,7 @@
     import { getUserMedia } from '@/utils/baseUtils'
     import { useAuthStore } from '@/stores/authStore'
     import { Peer } from "peerjs";
-    import { initPeerSettings } from '@/utils/peerjsUtils'
+    import { initPeerSettings, checkIsUserLeave } from '@/utils/peerjsUtils'
 
 
     // TODO encrypt 會議名稱 & pass
@@ -38,10 +38,11 @@
         // TODO 刪除console
         console.log('isRoomMeetingValid',isRoomMeetingValid)
         if(!isRoomMeetingValid) {
-            return useRouter().replace('/room')
+            useRouter().replace('/room')
+            return false
         }
+        return true
     }
-    checkIsRoomValid()
 
 
     // @  初始化peer
@@ -62,7 +63,7 @@
         }
     }
 
-    
+
     const startPeer = async () => {
         if(!connectUID.value) return
 
@@ -91,7 +92,7 @@
         peer = new Peer(connectUID.value)
         initPeerSettings({peer,onOpenCallBack})
     }
-    initPeer()
+    // initPeer()
 
 
     // @  加入uuidList
@@ -109,7 +110,10 @@
 
     // @ call function
     // TODO call other的邏輯處理
-    const tempSaveStreamID: string[] = []
+    const videoIDList: string[] = []
+    let videoCurTimeList: number[] = []
+    let kickoutCount: number[] = []
+    let checkInterval: number | undefined = undefined
     const callAllOtherUser = (roomUserList: {[uuid:string]: string}) => {
         console.log(roomUserList,'roomUserList!!@@##')
         Object.values(roomUserList).forEach((uuid: string) => {
@@ -117,21 +121,18 @@
 
             const call = peer.call(uuid, myStream)
             call.on("stream", (remoteStream:MediaStream) => {
-                const hasStream = tempSaveStreamID.find((id)=> id === remoteStream.id)
-                if(hasStream) return
-
-                tempSaveStreamID.push(remoteStream.id)
-                const newVideo = document.createElement("video");
-                newVideo.setAttribute('autoplay','')
-                newVideo.setAttribute('muted','')
-                newVideo.setAttribute('playsinline','')
-                newVideo.srcObject = remoteStream
-
-                const insertElement = document.getElementById('insertVideo')
-                insertElement?.appendChild(newVideo)
+                addVideoStream({remoteStream,videoIDList,videoCurTimeList,kickoutCount,checkInterval})
             })
 
         }) 
     }
-    
+
+
+    // @ main function
+    const initRoomEnter = async () => {
+        const isRommValid = await checkIsRoomValid()
+        if(!isRommValid) return
+        initPeer()
+    }
+    initRoomEnter()
 </script>
