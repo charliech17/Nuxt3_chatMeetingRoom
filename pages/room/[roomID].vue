@@ -20,7 +20,7 @@
     import { getUserMedia } from '@/utils/baseUtils'
     import { useAuthStore } from '@/stores/authStore'
     import { Peer } from "peerjs";
-    import { initPeerSettings, checkIsUserLeave } from '@/utils/peerjsUtils'
+    import { initPeerSettings, listenPeerEvent, addVideoStream } from '@/utils/connection/peerjsUtils'
 
 
     // TODO encrypt 會議名稱 & pass
