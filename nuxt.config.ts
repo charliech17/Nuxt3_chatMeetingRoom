@@ -23,6 +23,7 @@ export default defineNuxtConfig({
             FIREBASE_MESSAGING_SENDER_ID: process.env.FIREBASE_MESSAGING_SENDER_ID, 
             FIREBASE_APP_ID: process.env.FIREBASE_APP_ID, 
             FIREBASE_RTDB_KEY: process.env.FIREBASE_RTDB_KEY, 
+            SOCKET_CONNECTION_URL: process.env.SOCKET_CONNECTION_URL
         },
     },
 })
