@@ -62,7 +62,6 @@
                 // TODO 改成UUID套件，加上會議名稱、主持人名稱
                 const updateMeetingInfo = { 
                     isRoom: true,
-                    uuidList: [useAuthStore().uid], 
                 }
                 const hostMeetingInfo = {
                     createTime: new Date().toString(), 

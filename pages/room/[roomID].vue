@@ -84,7 +84,7 @@
                 }
                 await getUserMedia(constraints,callBackFunction)
 
-                const roomUserList =  await apiService(()=> getRTDBData(userRoomPath))
+                const roomUserList =  await apiService(()=> getRTDBData(userRoomPath)) || {}
                 addToUUID_List(roomUserList)
             })
         }
