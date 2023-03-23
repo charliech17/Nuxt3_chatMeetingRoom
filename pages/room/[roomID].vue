@@ -35,7 +35,7 @@
             </div>
         </section>
         <section class="bottomControlStyle">
-            <div class="controlWrapper">
+            <!-- <div class="controlWrapper">
                 <div class="topImg">
                     <img src="@/assets/image/mediaControls/volumeOff.png" alt="">
                 </div>
@@ -58,7 +58,19 @@
                     <img src="@/assets/image/mediaControls/noVideo.png" alt="">
                 </div>
                 <p class="bottomTxt">更多設定</p>
-            </div>
+            </div> -->
+            <v-btn stacked prepend-icon="mdi-volume-off" variant="tonal" >
+                連接音訊
+            </v-btn>
+            <v-btn stacked prepend-icon="mdi-video-off" variant="tonal" >
+                開啟視訊
+            </v-btn>
+            <v-btn stacked prepend-icon="mdi-monitor-share" variant="tonal" >
+                分享畫面
+            </v-btn>
+            <v-btn stacked prepend-icon="mdi-dots-vertical" variant="tonal" >
+                更多功能
+            </v-btn>
         </section>
     </div>
 </template>
@@ -201,12 +213,12 @@
         height: $bottomControlHeight;
         width: calc(100% + 32px);
         margin: -16px;
-        background-color: azure;
+        background-color: #3a3a3a;
         display: flex;
         align-items: center;
-        gap: 14px;
+        gap: 2px;
         padding: 10px;
-        // justify-content: center;
+        justify-content: center;
 
         .controlWrapper{
             text-align: center;
