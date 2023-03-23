@@ -1,16 +1,65 @@
 <template>
     <div>
-        <p>{{ 'hello  ' + $route.path }}</p>
-        <p>{{ '是否連接' + isConnect }}</p>
-        <div id="insertVideo">
-            <video 
-                id="myVideo" 
-                ref="myMedia_display"
-                autoplay
-                muted
-                playsinline
-            />
-        </div>
+        <section class="mainContetSection">
+            <p>{{ 'hello  ' + $route.path }}</p>
+            <p>{{ '是否連接' + isConnect }}</p>
+            <div id="insertVideo">
+                <video 
+                    id="myVideo" 
+                    ref="myMedia_display"
+                    autoplay
+                    muted
+                    playsinline
+                />
+                <video 
+                    id="myVideo1" 
+                    ref="myMedia_display"
+                    autoplay
+                    muted
+                    playsinline
+                />
+                <video 
+                    id="myVideo2" 
+                    ref="myMedia_display"
+                    autoplay
+                    muted
+                    playsinline
+                />
+                <video 
+                    id="myVideo3" 
+                    ref="myMedia_display"
+                    autoplay
+                    muted
+                    playsinline
+                />
+            </div>
+        </section>
+        <section class="bottomControlStyle">
+            <div class="controlWrapper">
+                <div class="topImg">
+                    <img src="@/assets/image/mediaControls/volumeOff.png" alt="">
+                </div>
+                <p class="bottomTxt">開啟聲音</p>
+            </div>
+            <div class="controlWrapper">
+                <div class="topImg">
+                    <img src="@/assets/image/mediaControls/noVideo.png" alt="">
+                </div>
+                <p class="bottomTxt">開啟視訊</p>
+            </div>
+            <div class="controlWrapper">
+                <div class="topImg">
+                    <img src="@/assets/image/mediaControls/noVideo.png" alt="">
+                </div>
+                <p class="bottomTxt">分享畫面</p>
+            </div>
+            <div class="controlWrapper">
+                <div class="topImg">
+                    <img src="@/assets/image/mediaControls/noVideo.png" alt="">
+                </div>
+                <p class="bottomTxt">更多設定</p>
+            </div>
+        </section>
     </div>
 </template>
 
@@ -136,3 +185,46 @@
     }
     initRoomEnter()
 </script>
+
+<style lang="scss" scoped>
+    #insertVideo{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    $bottomControlHeight: 80px;
+    .mainContetSection{
+        height: calc(var(--vh, 1vh)* 100 - var(--headerHeight) - $bottomControlHeight );
+        overflow: auto;
+    }
+    .bottomControlStyle{
+        height: $bottomControlHeight;
+        width: calc(100% + 32px);
+        margin: -16px;
+        background-color: azure;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 10px;
+        // justify-content: center;
+
+        .controlWrapper{
+            text-align: center;
+            padding: 8px;
+            border: 1px solid black;
+            box-shadow: 0px 3px 5px rgba(0,0,0,0.5);
+            .topImg{
+                width: 25px;
+                height: 25px;
+                margin: 0 auto;
+                
+                img{
+                    width: 100%;
+                }
+            }
+            .bottomTxt{
+                color: #000000;
+            }
+        }
+    }
+</style>
