@@ -1,3 +1,4 @@
+import type { Ref } from 'vue'
 
 export const getUserMedia = (constraints: mediaConstraintsType, callBack: Function):Promise<any> => {
     return navigator.mediaDevices
@@ -11,6 +12,22 @@ export const getUserMedia = (constraints: mediaConstraintsType, callBack: Functi
         /* handle the error */
     });
 }
+
+export const toggleStreamOutput = (stream: undefined | MediaStream, inputType: 'video' | 'audio', videoRef: Ref, soundRef: Ref) => {
+    if(!stream) return 
+    const videoTrack = stream.getTracks().find(track => track.kind === inputType)
+    console.log('vdTrack',videoTrack,stream)
+    
+    if(videoTrack?.enabled) {
+        videoTrack.enabled = false
+        console.log(videoTrack,videoTrack.enabled)
+        inputType === 'video' ? videoRef.value = false : soundRef.value = false
+    } else {
+        if(!videoTrack) return
+        videoTrack.enabled = true
+        inputType === 'video' ? videoRef.value = true : soundRef.value = true
+    }
+  }
 
 
 // ############## type  ############## //

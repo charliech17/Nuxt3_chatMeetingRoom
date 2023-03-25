@@ -5,6 +5,7 @@
             <p>{{ '是否連接' + isConnect }}</p>
             <div id="insertVideo">
                 <video 
+                    poster="@/assets/image/laughFace.avif"
                     id="myVideo" 
                     ref="myMedia_display"
                     autoplay
@@ -14,10 +15,10 @@
             </div>
         </section>
         <section class="bottomControlStyle">
-            <v-btn stacked prepend-icon="mdi-volume-off" variant="tonal" >
+            <v-btn stacked :prepend-icon="soundActiveRef ? 'mdi-microphone-outline' : 'mdi-volume-off'" variant="tonal" @click="() => pressToggleStream('audio')">
                 連接音訊
             </v-btn>
-            <v-btn stacked prepend-icon="mdi-video-off" variant="tonal" >
+            <v-btn stacked :prepend-icon="videoActiveRef ? 'mdi-video-outline' : 'mdi-video-off'" variant="tonal" @click="() => pressToggleStream('video')">
                 開啟視訊
             </v-btn>
             <v-btn stacked prepend-icon="mdi-monitor-share" variant="tonal" >
@@ -33,10 +34,11 @@
 
 <script lang="ts" setup>
     import { checkIsRTDBData, getRTDBData, setRTDBData } from '@/utils/firebase/useRTDB'
-    import { getUserMedia } from '@/utils/baseUtils'
+    import { getUserMedia, toggleStreamOutput } from '@/utils/baseUtils'
     import { useAuthStore } from '@/stores/authStore'
     import { Peer } from "peerjs";
     import { initPeerSettings, listenPeerEvent, addVideoStream } from '@/utils/connection/peerjsUtils'
+    import { storeToRefs } from 'pinia'
 
 
     // TODO encrypt 會議名稱 & pass
@@ -54,10 +56,24 @@
         // TODO 刪除console
         console.log('isRoomMeetingValid',isRoomMeetingValid)
         if(!isRoomMeetingValid) {
-            useRouter().replace('/room')
             return false
         }
         return true
+    }
+
+    const watchLoginStatus = async () => {
+        const authStore = useAuthStore()
+        if(authStore.isAuth === false) return false
+        const { isAuth } = storeToRefs(authStore)
+        return new Promise((resolve) => {
+            watch(isAuth,(newAuth) => {
+                if(newAuth === false) {
+                    return resolve(false)
+                } else if(newAuth === true) {
+                    return resolve(true)
+                }
+            })
+        })
     }
 
 
@@ -96,6 +112,8 @@
                     if(myVideo) {
                         myStream = stream
                         myVideo.srcObject = stream;
+                        videoActiveRef.value = true
+                        soundActiveRef.value = true
                     }
                     listenPeerEvent({peer,localStream:stream})
                 }
@@ -144,10 +162,18 @@
     }
 
 
+    // @ 畫面事件
+    const videoActiveRef = ref(false)
+    const soundActiveRef = ref(false)
+    const pressToggleStream = (inputType: 'video' | 'audio') => {
+        toggleStreamOutput(myStream,inputType,videoActiveRef,soundActiveRef)
+    }
+
     // @ main function
     const initRoomEnter = async () => {
+        const isLogin = await watchLoginStatus()
         const isRommValid = await checkIsRoomValid()
-        if(!isRommValid) return
+        if(!isRommValid || !isLogin) return useRouter().replace('/room')
         initPeer()
     }
     initRoomEnter()
@@ -161,13 +187,13 @@
 
     $bottomControlHeight: 80px;
     .mainContetSection{
-        height: calc(var(--vh, 1vh)* 100 - var(--headerHeight) - $bottomControlHeight );
+        height: calc(var(--vh, 1vh)* 100 - var(--headerHeight) - $bottomControlHeight - 32px);
         overflow: auto;
     }
     .bottomControlStyle{
         height: $bottomControlHeight;
         width: calc(100% + 32px);
-        margin: -16px;
+        margin: 0 -16px;
         background-color: #3a3a3a;
         display: flex;
         align-items: center;
