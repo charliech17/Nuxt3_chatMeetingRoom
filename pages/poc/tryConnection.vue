@@ -37,7 +37,7 @@ socket.on("disconnect", () => {
     console.log(socket.id); // undefined
 });
 
-socket.on('asd',(message)=>{
+socket.on('confirmConnection',(message)=>{
     socketMessage.value = message 
 })
 
