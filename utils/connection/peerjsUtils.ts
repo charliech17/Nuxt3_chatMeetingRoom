@@ -1,12 +1,11 @@
 // TODO 加上close、disconnected、error事件的處理
-export const initPeerSettings = ({peer, onOpenCallBack}: initSettingsType ) => {
+export const initPeerSettings = ({peer}: initSettingsType ) => {
     // @ 自己裝置連接上peer
-    peer.on('open',()=> {
-        console.log('open!!!!',peer)
-        if(onOpenCallBack) {
-            onOpenCallBack()
+    return new Promise(
+        (resolve) => { 
+            peer.on('open',()=> {resolve('')})
         }
-    })
+    )
 }
 
 
@@ -120,7 +119,6 @@ export const kickoutUser = (index:number,video: HTMLVideoElement,videoIDList: st
 
 interface initSettingsType {
     peer: any, 
-    onOpenCallBack?: Function, 
 }
 
 interface listenPeerType {

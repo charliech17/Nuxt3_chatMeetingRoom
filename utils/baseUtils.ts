@@ -1,10 +1,10 @@
 import type { Ref } from 'vue'
 
-export const getUserMedia = (constraints: mediaConstraintsType, callBack: Function):Promise<any> => {
+export const getUserMedia = (constraints: mediaConstraintsType):Promise<any> => {
     return navigator.mediaDevices
     .getUserMedia(constraints)
     .then((stream) => {
-        callBack(stream)
+        return stream
     })
     .catch((err) => {
         alert(err)

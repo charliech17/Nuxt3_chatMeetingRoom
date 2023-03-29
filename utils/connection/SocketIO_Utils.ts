@@ -8,14 +8,16 @@ export const initSocketSetting = ({onRemoteConnect}:socketInitType) => {
     socket = io(config.public.SOCKET_CONNECTION_URL);
 
     socket.on("connect", () => {
-        onRemoteConnect()
-        console.log(socket.id);
-        // TODO 傳{sockeid: uid} 給server
+        onRemoteConnect(socket.id)
         socket.emit('hello',{name:'Josh',age:18})
     });
 
     socket.on('confirmConnection',(data: string)=> {
         console.log(data)
+    })
+
+    socket.on('roomJoinSuccess',(data: string[])=> {
+        console.log('roomJoinSuccess',data)
     })
 
 }
@@ -34,6 +36,7 @@ interface socketInitType {
 interface ServerToClientEvents {
     connection: () => void;
     confirmConnection: (data: string) => void
+    roomJoinSuccess: (data: string[]) => void
 }
 
 

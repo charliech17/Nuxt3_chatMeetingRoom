@@ -39,6 +39,9 @@
     import { Peer } from "peerjs";
     import { initPeerSettings, listenPeerEvent, addVideoStream } from '@/utils/connection/peerjsUtils'
     import { storeToRefs } from 'pinia'
+    import { initSocketSetting, joinRoomEmit } from '@/utils/connection/SocketIO_Utils'
+    // @ts-ignore
+    import { v4 as uuidv4 } from 'uuid';
 
 
     // TODO encrypt 會議名稱 & pass
@@ -61,6 +64,8 @@
         return true
     }
 
+
+    // @ 檢查是否登入
     const watchLoginStatus = async () => {
         const authStore = useAuthStore()
         if(authStore.isAuth === false) return false
@@ -82,55 +87,52 @@
     const myMedia_display = ref<HTMLVideoElement|null>(null)
     let myStream: undefined | MediaStream;
     let peer: any
-
-    const initPeer = () => {
-        if(connectUID.value) {
-            startPeer()
-        } else {
-            watch(connectUID,(newValue)=> {
-                if(newValue) {
-                    startPeer()
-                }
-            })
-        }
-    }
-
+    let peerUUID: string
 
     const startPeer = async () => {
-        if(!connectUID.value) return
+        // peer settings
+        peerUUID = uuidv4()
+        peer = new Peer(peerUUID)
+        await initPeerSettings({peer})
+        isConnect.value = true
 
-        const onOpenCallBack = () => {
-            isConnect.value = true
-            
-            nextTick(async ()=> {
-                const constraints = {
-                    audio: true,
-                    video: { facingMode: "user" },
-                }
-                const callBackFunction = (stream: MediaStream) => {
-                    const myVideo = myMedia_display.value as HTMLVideoElement | null
-                    if(myVideo) {
-                        myStream = stream
-                        myVideo.srcObject = stream;
-                        videoActiveRef.value = true
-                        soundActiveRef.value = true
-                    }
-                    listenPeerEvent({peer,localStream:stream})
-                }
-                await getUserMedia(constraints,callBackFunction)
-
-                const roomUserList =  await apiService(()=> getRTDBData(userRoomPath)) || {}
-                addToUUID_List(roomUserList)
-            })
+        // 開始視訊
+        const constraints = {
+            audio: true,
+            video: { facingMode: "user" },
         }
-        peer = new Peer(connectUID.value)
-        initPeerSettings({peer,onOpenCallBack})
+        const stream = await getUserMedia(constraints)
+        const myVideo = myMedia_display.value as HTMLVideoElement | null
+        if(myVideo) {
+            myStream = stream
+            myVideo.srcObject = stream;
+            videoActiveRef.value = true
+            soundActiveRef.value = true
+        }
+        listenPeerEvent({peer,localStream:stream})
     }
-    // initPeer()
 
+
+    // @ 連接websocket
+    const startWebSocket = () => {
+        return new Promise((resolve) => {
+            initSocketSetting({
+                onRemoteConnect:(socketID: string)=> {
+                    const roomInfo = {
+                        [socketID]:{
+                            uid:connectUID.value,
+                            peerID: peerUUID,
+                            roomPath: baseRoomURL,
+                        }
+                    }
+                    joinRoomEmit(roomInfo)
+                    resolve('')
+                }
+            })
+        })
+    }
 
     // @  加入uuidList
-    // const roomUserList =  await apiService(()=> getRTDBData(userRoomPath))
     const addToUUID_List = async (roomUserList: {[uuid:string]: string}) => {
         const isInList =  Object.values(roomUserList).find((uuid) => uuid === connectUID.value)
         if(!isInList) {
@@ -169,12 +171,15 @@
         toggleStreamOutput(myStream,inputType,videoActiveRef,soundActiveRef)
     }
 
+    
     // @ main function
     const initRoomEnter = async () => {
         const isLogin = await watchLoginStatus()
         const isRommValid = await checkIsRoomValid()
         if(!isRommValid || !isLogin) return useRouter().replace('/room')
-        initPeer()
+        await startPeer()
+        await startWebSocket()
+        
     }
     initRoomEnter()
 </script>
