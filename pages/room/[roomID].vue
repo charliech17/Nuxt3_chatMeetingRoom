@@ -33,7 +33,7 @@
 
 
 <script lang="ts" setup>
-    import { checkIsRTDBData, getRTDBData, setRTDBData } from '@/utils/firebase/useRTDB'
+    import { checkIsRTDBData } from '@/utils/firebase/useRTDB'
     import { getUserMedia, toggleStreamOutput } from '@/utils/baseUtils'
     import { useAuthStore } from '@/stores/authStore'
     import { Peer } from "peerjs";
@@ -127,39 +127,28 @@
                     }
                     joinRoomEmit(roomInfo)
                     resolve('')
+                },
+                onJoinRoomSuccess: (roomPeerList) => {
+                    callAllOtherUser(roomPeerList)
+                },
+                onUserLeave: (leavePeerID) => {
+                    document.getElementById(leavePeerID)?.remove()
                 }
             })
         })
-    }
-
-    // @  加入uuidList
-    const addToUUID_List = async (roomUserList: {[uuid:string]: string}) => {
-        const isInList =  Object.values(roomUserList).find((uuid) => uuid === connectUID.value)
-        if(!isInList) {
-            const uuidListLength = Object.values(roomUserList).length
-            const newList = {...roomUserList,[uuidListLength]: connectUID.value}
-            await apiService(()=> setRTDBData(userRoomPath,newList))
-            callAllOtherUser(newList)
-        }
     }
 
 
     // @ call function
     // TODO call other的邏輯處理
     const videoIDList: string[] = []
-    let videoCurTimeList: number[] = []
-    let kickoutCount: number[] = []
-    let checkInterval: number | undefined = undefined
-    const callAllOtherUser = (roomUserList: {[uuid:string]: string}) => {
-        console.log(roomUserList,'roomUserList!!@@##')
-        Object.values(roomUserList).forEach((uuid: string) => {
-            if(uuid === useAuthStore().uid) return
-
-            const call = peer.call(uuid, myStream)
+    const callAllOtherUser = (roomPeerList: string[]) => {
+        console.log(roomPeerList,'roomPeerList!!@@##')
+        roomPeerList.forEach((eachPeer: string) => {
+            const call = peer.call(eachPeer, myStream)
             call.on("stream", (remoteStream:MediaStream) => {
-                addVideoStream({remoteStream,videoIDList,videoCurTimeList,kickoutCount,checkInterval})
+                addVideoStream({remoteStream,videoIDList,call})
             })
-
         }) 
     }
 
