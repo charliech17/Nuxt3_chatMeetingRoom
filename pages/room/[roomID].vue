@@ -21,9 +21,15 @@
                 variant="tonal" 
                 @click="() => pressToggleStream('audio')"
             >
+                <template v-slot:prepend>
+                    <v-icon :color="audioIconColor"></v-icon>
+                </template>
                 連接音訊
             </v-btn>
             <v-btn stacked :prepend-icon="videoActiveRef ? 'mdi-video-outline' : 'mdi-video-off'" variant="tonal" @click="() => pressToggleStream('video')">
+                <template v-slot:prepend>
+                    <v-icon :color="videoActiveRef ? '' : 'red'"></v-icon>
+                </template>
                 開啟視訊
             </v-btn>
             <v-btn stacked prepend-icon="mdi-monitor-share" variant="tonal" >
@@ -214,6 +220,15 @@
             return soundActiveRef.value ? 'mdi-microphone-outline' : 'mdi-microphone-off'
         } else {
             return 'mdi-volume-off'
+        }
+    })
+
+
+    const audioIconColor = computed(()=> {
+        if(isSoundConnect.value) {
+            return soundActiveRef.value ? '' : 'red'
+        } else {
+            return 'red'
         }
     })
     
