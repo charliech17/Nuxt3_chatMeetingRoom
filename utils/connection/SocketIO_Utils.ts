@@ -4,7 +4,7 @@ const config = useRuntimeConfig()
 let socket: Socket<ServerToClientEvents, ClientToServerEvents>  //= //io('http://localhost:4000/'/*config.public.SOCKET_CONNECTION_URL*/);
 
 
-export const initSocketSetting = ({onRemoteConnect,onJoinRoomSuccess,onUserLeave}:socketInitType) => {
+export const initSocketSetting = ({onRemoteConnect,onJoinRoomSuccess,onUserLeave,onOther_BG_Change}:socketInitType) => {
     socket = io(config.public.SOCKET_CONNECTION_URL);
 
     socket.on("connect", () => {
@@ -23,6 +23,10 @@ export const initSocketSetting = ({onRemoteConnect,onJoinRoomSuccess,onUserLeave
     socket.on('leaveRoom',(data: {leavePeer: string})=> {
         onUserLeave(data.leavePeer)
     })
+
+    socket.on('userToggleBackground',(data: backgroundType)=> {
+        onOther_BG_Change(data)
+    })
 }
 
 
@@ -30,23 +34,33 @@ export const joinRoomEmit = (data: Object) => {
     socket.emit('JoinRoom',data)
 }
 
+export const toggleBackground = 
+    (data: backgroundType) => {
+        socket.emit('toggleBackground',data)
+    }
+
 // ##########  type  ########## 
+
+type backgroundType = {roomPath: string, peerID: string ,isVideoOpen: boolean}
 
 interface socketInitType {
     onRemoteConnect: Function,
     onJoinRoomSuccess: (data: string[]) => void
     onUserLeave: (leavePeerID : string) => void
+    onOther_BG_Change: (data: backgroundType) => void
 }
 
 interface ServerToClientEvents {
-    connection: () => void;
+    connection: (data: backgroundType) => void;
     confirmConnection: (data: string) => void
     roomJoinSuccess: (roomPeerList: string[]) => void
     leaveRoom: (data: {leavePeer: string}) => void
+    userToggleBackground: (data: backgroundType) => void
 }
 
 
 interface ClientToServerEvents{
     hello: (obj: {name: string,age: number}) => void;
     JoinRoom: (obj: Object) => void;
+    toggleBackground: (obj: backgroundType) => void
 }

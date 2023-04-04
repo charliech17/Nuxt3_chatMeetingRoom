@@ -13,21 +13,36 @@ export const getUserMedia = (constraints: mediaConstraintsType):Promise<any> => 
     });
 }
 
-export const toggleStreamOutput = (stream: undefined | MediaStream, inputType: 'video' | 'audio', videoRef: Ref, soundRef: Ref) => {
-    if(!stream) return 
-    const videoTrack = stream.getTracks().find(track => track.kind === inputType)
-    console.log('vdTrack',videoTrack,stream)
-    
-    if(videoTrack?.enabled) {
-        videoTrack.enabled = false
-        console.log(videoTrack,videoTrack.enabled)
-        inputType === 'video' ? videoRef.value = false : soundRef.value = false
-    } else {
-        if(!videoTrack) return
-        videoTrack.enabled = true
-        inputType === 'video' ? videoRef.value = true : soundRef.value = true
+export const toggleStreamOutput = (
+        stream: undefined | MediaStream, 
+        inputType: 'video' | 'audio', 
+        videoRef: Ref, 
+        soundRef: Ref,
+        toggle_BG_function: (isVideoOpen: boolean) => void
+    ) => 
+        {
+            if(!stream) return 
+            const mediaTrack = stream.getTracks().find(track => track.kind === inputType)
+            
+            if(mediaTrack?.enabled) {
+                mediaTrack.enabled = false
+                if(inputType === 'video') {
+                    toggle_BG_function(false)
+                    videoRef.value = false
+                } else {
+                    soundRef.value = false
+                }
+            } else {
+                if(!mediaTrack) return
+                mediaTrack.enabled = true
+                if(inputType === 'video') {
+                    toggle_BG_function(true)
+                    videoRef.value = true
+                } else {
+                    soundRef.value = true
+                }
+            }
     }
-  }
 
 
 export const enumerateAllSource = () => {

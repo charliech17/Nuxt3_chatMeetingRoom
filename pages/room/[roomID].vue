@@ -4,14 +4,17 @@
             <p>{{ 'hello  ' + $route.path }}</p>
             <p>{{ '是否連接' + isConnect }}</p>
             <div id="insertVideo">
-                <video 
-                    poster="@/assets/image/laughFace.avif"
-                    id="myVideo" 
-                    ref="myMedia_display"
-                    autoplay
-                    muted
-                    playsinline
-                />
+                <div class="position-relative">
+                    <video 
+                        poster="@/assets/image/laughFace.avif"
+                        id="myVideo" 
+                        ref="myMedia_display"
+                        autoplay
+                        muted
+                        playsinline
+                    />
+                    <img v-if="!videoActiveRef" class="video_BGimage" src="@/assets/image/laughFace.avif" alt="">
+                </div>
             </div>
         </section>
         <section class="bottomControlStyle">
@@ -73,10 +76,9 @@
     import { Peer } from "peerjs";
     import { initPeerSettings, listenPeerEvent, addVideoStream } from '@/utils/connection/peerjsUtils'
     import { storeToRefs } from 'pinia'
-    import { initSocketSetting, joinRoomEmit } from '@/utils/connection/SocketIO_Utils'
+    import { initSocketSetting, joinRoomEmit, toggleBackground } from '@/utils/connection/SocketIO_Utils'
     // @ts-ignore
     import { v4 as uuidv4 } from 'uuid';
-
 
     // TODO encrypt 會議名稱 & pass
     // TODO　將function抽出來寫
@@ -167,6 +169,13 @@
                 },
                 onUserLeave: (leavePeerID) => {
                     document.getElementById(leavePeerID)?.remove()
+                },
+                onOther_BG_Change: (otherBackgroundInfo) => {
+                    const bgImage = document.getElementById(otherBackgroundInfo.peerID)?.querySelector('img')
+                    console.log(otherBackgroundInfo, bgImage)
+                    if(bgImage) {
+                        bgImage.style.display = otherBackgroundInfo.isVideoOpen ? 'none' : 'block'
+                    }
                 }
             })
         })
@@ -194,7 +203,11 @@
     const isDialogOpen = ref(false)
     const pressToggleStream = (inputType: 'video' | 'audio') => {
         if(inputType === 'audio' && !isSoundConnect.value) return handleSoundActive()
-        toggleStreamOutput(myStream,inputType,videoActiveRef,soundActiveRef)
+
+        const _toggle_BG_function = (isVideoOpen: boolean) => {
+            toggleBackground({roomPath: baseRoomURL,peerID: peerUUID, isVideoOpen})
+        }
+        toggleStreamOutput(myStream,inputType,videoActiveRef,soundActiveRef,_toggle_BG_function)
     }
 
 
@@ -248,6 +261,13 @@
     #insertVideo{
         display: grid;
         grid-template-columns: 1fr 1fr;
+
+        .video_BGimage{
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+        }
     }
 
     $bottomControlHeight: 80px;

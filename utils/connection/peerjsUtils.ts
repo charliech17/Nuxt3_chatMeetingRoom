@@ -66,6 +66,10 @@ export const addVideoStream = (
         if(hasStream) return
 
         videoIDList.push(call.peer)
+        const newWrapperDiv = document.createElement("div");
+        newWrapperDiv.classList.add('position-relative')
+        newWrapperDiv.id = call.peer
+        
         const newVideo = document.createElement("video");
         newVideo.setAttribute('autoplay','')
         newVideo.setAttribute('playsinline','')
@@ -73,10 +77,20 @@ export const addVideoStream = (
             newVideo.setAttribute('muted','')
         }
         newVideo.srcObject = remoteStream
-        newVideo.id = call.peer
+
+        const newVideoBackground = document.createElement("img");
+        newVideoBackground.src=`/_nuxt/assets/image/laughFace.avif`
+        newVideoBackground.classList.add('position-absolute')
+        newVideoBackground.style.top = '50%'
+        newVideoBackground.style.left = '0'
+        newVideoBackground.style.transform = 'translateY(-50%)'
+        newVideoBackground.style.display = 'none'
+
+        newWrapperDiv.appendChild(newVideo)
+        newWrapperDiv.appendChild(newVideoBackground)
 
         const insertElement = document.getElementById('insertVideo')
-        insertElement?.appendChild(newVideo)
+        insertElement?.appendChild(newWrapperDiv)
 }
 
 //  ################## type ##################  //
