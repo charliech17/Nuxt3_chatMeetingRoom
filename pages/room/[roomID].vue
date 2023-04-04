@@ -202,7 +202,8 @@
         const allOtherVideo = document.querySelectorAll('#insertVideo > video:not(#myVideo)') as NodeListOf<HTMLVideoElement>
             console.log(allOtherVideo)
         for(let video of allOtherVideo) {
-            video.removeAttribute('muted')
+            video.muted = false
+            video.play()
         }
         isDialogOpen.value = false
     }
