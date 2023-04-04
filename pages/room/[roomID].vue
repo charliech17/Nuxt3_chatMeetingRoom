@@ -15,7 +15,12 @@
             </div>
         </section>
         <section class="bottomControlStyle">
-            <v-btn stacked :prepend-icon="soundActiveRef ? 'mdi-microphone-outline' : 'mdi-volume-off'" variant="tonal" @click="() => pressToggleStream('audio')">
+            <v-btn 
+                stacked 
+                :prepend-icon="audioIcon" 
+                variant="tonal" 
+                @click="() => pressToggleStream('audio')"
+            >
                 連接音訊
             </v-btn>
             <v-btn stacked :prepend-icon="videoActiveRef ? 'mdi-video-outline' : 'mdi-video-off'" variant="tonal" @click="() => pressToggleStream('video')">
@@ -28,6 +33,29 @@
                 更多功能
             </v-btn>
         </section>
+        <v-dialog
+            v-model="isDialogOpen"
+            width="auto"
+            content-class="bg-white"
+        >
+            <v-card-text>
+                是否連接音訊?
+            </v-card-text>
+            <v-card-actions>
+                <v-btn 
+                    color="primary" 
+                    @click="isDialogOpen = false"
+                >
+                不要連接
+                </v-btn>
+                <v-btn 
+                    color="primary" 
+                    @click="handleConnectAudio"
+                >
+                連接音訊
+                </v-btn>
+            </v-card-actions>
+        </v-dialog>
     </div>
 </template>
 
@@ -109,7 +137,7 @@
             videoActiveRef.value = true
             soundActiveRef.value = true
         }
-        listenPeerEvent({peer,localStream:stream})
+        listenPeerEvent({peer,localStream:stream,isConnectAudioRef: isSoundConnect})
     }
 
 
@@ -147,19 +175,46 @@
         roomPeerList.forEach((eachPeer: string) => {
             const call = peer.call(eachPeer, myStream)
             call.on("stream", (remoteStream:MediaStream) => {
-                addVideoStream({remoteStream,videoIDList,call})
+                addVideoStream({remoteStream,videoIDList,call,isConnectAudioRef: isSoundConnect})
             })
         }) 
     }
 
 
     // @ 畫面事件
+    const isSoundConnect = ref(false)
     const videoActiveRef = ref(false)
     const soundActiveRef = ref(false)
+    const isDialogOpen = ref(false)
     const pressToggleStream = (inputType: 'video' | 'audio') => {
+        if(inputType === 'audio' && !isSoundConnect.value) return handleSoundActive()
         toggleStreamOutput(myStream,inputType,videoActiveRef,soundActiveRef)
     }
 
+
+    const handleSoundActive = () => {
+        isDialogOpen.value = true
+    }
+
+
+    const handleConnectAudio = () => {
+        isSoundConnect.value = true
+        const allOtherVideo = document.querySelectorAll('#insertVideo > video:not(#myVideo)') as NodeListOf<HTMLVideoElement>
+            console.log(allOtherVideo)
+        for(let video of allOtherVideo) {
+            video.removeAttribute('muted')
+        }
+        isDialogOpen.value = false
+    }
+
+
+    const audioIcon = computed(()=> {
+        if(isSoundConnect.value) {
+            return soundActiveRef.value ? 'mdi-microphone-outline' : 'mdi-microphone-off'
+        } else {
+            return 'mdi-volume-off'
+        }
+    })
     
     // @ main function
     const initRoomEnter = async () => {

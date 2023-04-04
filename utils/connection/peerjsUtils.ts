@@ -1,3 +1,5 @@
+import type { Ref } from 'vue'
+
 // TODO 加上close、disconnected、error事件的處理
 export const initPeerSettings = ({peer}: initSettingsType ) => {
     // @ 自己裝置連接上peer
@@ -9,7 +11,7 @@ export const initPeerSettings = ({peer}: initSettingsType ) => {
 }
 
 
-export const listenPeerEvent = ({peer,dataReciveCallBack, onConnectionCallBack, onCallCallBack,localStream}:listenPeerType) => {
+export const listenPeerEvent = ({peer,dataReciveCallBack, onConnectionCallBack,localStream, isConnectAudioRef}:listenPeerType) => {
     // @ 別的裝置連接上
     peer.on("connection", (conn:any) => {
         console.log('connection!!!!')
@@ -28,7 +30,7 @@ export const listenPeerEvent = ({peer,dataReciveCallBack, onConnectionCallBack, 
     //  @ 別的裝置call
     peer.on("call", (call: any) => {
         // if(onCallCallBack) {
-            baseOnCallFunction(call,localStream)
+            baseOnCallFunction(call,localStream,isConnectAudioRef)
         // }
     })
 
@@ -49,15 +51,15 @@ export const listenPeerEvent = ({peer,dataReciveCallBack, onConnectionCallBack, 
 }
 
 const videoIDList: string[] = []
-export const baseOnCallFunction = (call: any, localStream: MediaStream | undefined) => {
+export const baseOnCallFunction = (call: any, localStream: MediaStream | undefined, isConnectAudioRef: Ref<boolean>) => {
     call.answer(localStream);
     call.on("stream", (remoteStream: MediaStream) => {
-        addVideoStream({remoteStream,videoIDList,call})
+        addVideoStream({remoteStream,videoIDList,call,isConnectAudioRef})
     })
 }
 
 export const addVideoStream = (
-    {remoteStream,videoIDList,call} :addVideoStreamType
+    {remoteStream,videoIDList,call,isConnectAudioRef} :addVideoStreamType
     ) => {
         console.log('remoteStream.id')
         const hasStream = videoIDList.find((id)=> id === call.peer)
@@ -66,8 +68,10 @@ export const addVideoStream = (
         videoIDList.push(call.peer)
         const newVideo = document.createElement("video");
         newVideo.setAttribute('autoplay','')
-        newVideo.setAttribute('muted','')
         newVideo.setAttribute('playsinline','')
+        if(!isConnectAudioRef.value) {
+            newVideo.setAttribute('muted','')
+        }
         newVideo.srcObject = remoteStream
         newVideo.id = call.peer
 
@@ -87,10 +91,12 @@ interface listenPeerType {
     dataReciveCallBack?: Function, 
     onConnectionCallBack?:Function,
     onCallCallBack?:Function,
+    isConnectAudioRef: Ref<boolean>,
 }
 
 interface addVideoStreamType {
     remoteStream: MediaStream,
     videoIDList: string[],
     call: any,
+    isConnectAudioRef: Ref<boolean>,
 }
