@@ -1,5 +1,7 @@
 import type { Ref } from 'vue'
 import { use_roomInfo_Store } from '@/stores/roomInfoStore'
+import InsertNewVideo from '@/components/room/insertNewVideo.vue'
+import { defineComponent, createApp, defineProps } from 'vue'
 
 // TODO 加上close、disconnected、error事件的處理
 export const initPeerSettings = ({peer}: initSettingsType ) => {
@@ -69,38 +71,33 @@ export const addVideoStream = (
         if(hasStream) return
 
         videoIDList.push(call.peer)
-        const newWrapperDiv = document.createElement("div");
-        newWrapperDiv.classList.add('position-relative')
-        newWrapperDiv.id = call.peer
-        
-        const newVideo = document.createElement("video");
-        newVideo.setAttribute('autoplay','')
-        newVideo.setAttribute('playsinline','')
-        if(!isConnectAudioRef.value) {
-            newVideo.setAttribute('muted','')
-        }
-        newVideo.srcObject = remoteStream
+        const insertVideoSection = defineComponent({ 
+            extends: InsertNewVideo,
+            template:`<template><InsertNewVideo/></template>`,
+            setup(){
+                onMounted(()=> {
+                    const newVideo = document.getElementById(call.peer)?.querySelector('video') as HTMLVideoElement
+                    newVideo.srcObject = remoteStream
+                    if(!isConnectAudioRef.value) {
+                        newVideo.setAttribute('muted','')
+                        newVideo.muted = true
+                    }
+                })
+            }
+        })
 
-        const newVideoBackground = document.createElement("img");
-        // const imageUrl = new URL('~/assets/image/mediaControls/laughFace.avif', import.meta.url).href
-        // TODO 將對方背景URL換成固定圖片(別人頭像，或預設圖片)
-        newVideoBackground.src = 'https://source.unsplash.com/random/1920x1081'
-        newVideoBackground.classList.add('position-absolute')
-        newVideoBackground.style.top = '50%'
-        newVideoBackground.style.left = '0'
-        newVideoBackground.style.transform = 'translateY(-50%)'
-        newVideoBackground.style.display = 'none'
+        const wrapperDiv = document.createElement('div')
+        wrapperDiv.classList.add('position-relative')
+        wrapperDiv.id = call.peer
 
-        newWrapperDiv.appendChild(newVideo)
-        newWrapperDiv.appendChild(newVideoBackground)
-
-        const insertElement = document.getElementById('insertVideo')
-        insertElement?.appendChild(newWrapperDiv)
+        const insertElement = document.getElementById('insertVideo') as Element
+        insertElement?.appendChild(wrapperDiv)
+        createApp(insertVideoSection).mount(wrapperDiv)
 }
 
 
 const baseOnDataRecieveFunction = (data: dataTransferType) => {
-    const selectVideoImg = document.getElementById(data.peerID)?.querySelector('img') as HTMLImageElement
+    const selectVideoImg = document.getElementById(data.peerID)?.querySelector('.bg_wrapper_div') as HTMLDivElement
     console.log(selectVideoImg,data)
     if(selectVideoImg) {
         selectVideoImg.style.display = data.videoOpen ? 'none' : 'block'

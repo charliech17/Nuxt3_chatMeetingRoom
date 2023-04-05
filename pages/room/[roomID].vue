@@ -173,7 +173,7 @@
                     document.getElementById(leavePeerID)?.remove()
                 },
                 onOther_BG_Change: (otherBackgroundInfo) => {
-                    const bgImage = document.getElementById(otherBackgroundInfo.peerID)?.querySelector('img')
+                    const bgImage = document.getElementById(otherBackgroundInfo.peerID)?.querySelector('.bg_wrapper_div') as HTMLDivElement
                     console.log(otherBackgroundInfo, bgImage)
                     if(bgImage) {
                         bgImage.style.display = otherBackgroundInfo.isVideoOpen ? 'none' : 'block'
