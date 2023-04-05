@@ -220,7 +220,7 @@
 
     const handleConnectAudio = () => {
         isSoundConnect.value = true
-        const allOtherVideo = document.querySelectorAll('#insertVideo > video:not(#myVideo)') as NodeListOf<HTMLVideoElement>
+        const allOtherVideo = document.querySelectorAll('#insertVideo > div > video:not(#myVideo)') as NodeListOf<HTMLVideoElement>
             console.log(allOtherVideo)
         for(let video of allOtherVideo) {
             video.muted = false
