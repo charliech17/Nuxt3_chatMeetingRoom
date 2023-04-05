@@ -1,4 +1,5 @@
 import type { Ref } from 'vue'
+import { use_roomInfo_Store } from '@/stores/roomInfoStore'
 
 export const getUserMedia = (constraints: mediaConstraintsType):Promise<any> => {
     return navigator.mediaDevices
@@ -29,6 +30,7 @@ export const toggleStreamOutput = (
                 if(inputType === 'video') {
                     toggle_BG_function(false)
                     videoRef.value = false
+                    use_roomInfo_Store().setVideoStaus(false)
                 } else {
                     soundRef.value = false
                 }
@@ -38,6 +40,7 @@ export const toggleStreamOutput = (
                 if(inputType === 'video') {
                     toggle_BG_function(true)
                     videoRef.value = true
+                    use_roomInfo_Store().setVideoStaus(true)
                 } else {
                     soundRef.value = true
                 }

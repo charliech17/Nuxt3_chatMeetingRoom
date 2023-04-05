@@ -73,6 +73,7 @@
     import { checkIsRTDBData } from '@/utils/firebase/useRTDB'
     import { getUserMedia, toggleStreamOutput } from '@/utils/baseUtils'
     import { useAuthStore } from '@/stores/authStore'
+    import { use_roomInfo_Store } from '@/stores/roomInfoStore'
     import { Peer } from "peerjs";
     import { initPeerSettings, listenPeerEvent, addVideoStream } from '@/utils/connection/peerjsUtils'
     import { storeToRefs } from 'pinia'
@@ -144,6 +145,7 @@
             myVideo.srcObject = stream;
             videoActiveRef.value = true
             soundActiveRef.value = true
+            use_roomInfo_Store().setVideoStaus(true)
         }
         listenPeerEvent({peer,localStream:stream,isConnectAudioRef: isSoundConnect})
     }

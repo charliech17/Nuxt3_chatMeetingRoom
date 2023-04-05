@@ -1,4 +1,5 @@
 import type { Ref } from 'vue'
+import { use_roomInfo_Store } from '@/stores/roomInfoStore'
 
 // TODO 加上close、disconnected、error事件的處理
 export const initPeerSettings = ({peer}: initSettingsType ) => {
@@ -15,7 +16,9 @@ export const listenPeerEvent = ({peer,dataReciveCallBack, onConnectionCallBack,l
     // @ 別的裝置連接上
     peer.on("connection", (conn:any) => {
         console.log('connection!!!!')
-        conn.on("data", (data: string) => {
+        conn.on("data", (data: dataTransferType) => {
+            baseOnDataRecieveFunction(data)
+
             if(dataReciveCallBack) {
                 dataReciveCallBack()
             }
@@ -29,8 +32,7 @@ export const listenPeerEvent = ({peer,dataReciveCallBack, onConnectionCallBack,l
 
     //  @ 別的裝置call
     peer.on("call", (call: any) => {
-        // if(onCallCallBack) {
-            baseOnCallFunction(call,localStream,isConnectAudioRef)
+        baseOnCallFunction(call,localStream,isConnectAudioRef,peer)
         // }
     })
 
@@ -51,17 +53,18 @@ export const listenPeerEvent = ({peer,dataReciveCallBack, onConnectionCallBack,l
 }
 
 const videoIDList: string[] = []
-export const baseOnCallFunction = (call: any, localStream: MediaStream | undefined, isConnectAudioRef: Ref<boolean>) => {
+export const baseOnCallFunction = (call: any, localStream: MediaStream | undefined, isConnectAudioRef: Ref<boolean>, peer: any) => {
     call.answer(localStream);
     call.on("stream", (remoteStream: MediaStream) => {
         addVideoStream({remoteStream,videoIDList,call,isConnectAudioRef})
+        sendVideoOpenStatus(peer,call)
     })
 }
 
 export const addVideoStream = (
     {remoteStream,videoIDList,call,isConnectAudioRef} :addVideoStreamType
     ) => {
-        console.log('remoteStream.id')
+        console.log('remoteStream.id',call)
         const hasStream = videoIDList.find((id)=> id === call.peer)
         if(hasStream) return
 
@@ -79,7 +82,9 @@ export const addVideoStream = (
         newVideo.srcObject = remoteStream
 
         const newVideoBackground = document.createElement("img");
-        newVideoBackground.src=`/_nuxt/assets/image/laughFace.avif`
+        // const imageUrl = new URL('~/assets/image/mediaControls/laughFace.avif', import.meta.url).href
+        // TODO 將對方背景URL換成固定圖片(別人頭像，或預設圖片)
+        newVideoBackground.src = 'https://source.unsplash.com/random/1920x1081'
         newVideoBackground.classList.add('position-absolute')
         newVideoBackground.style.top = '50%'
         newVideoBackground.style.left = '0'
@@ -93,7 +98,31 @@ export const addVideoStream = (
         insertElement?.appendChild(newWrapperDiv)
 }
 
+
+const baseOnDataRecieveFunction = (data: dataTransferType) => {
+    const selectVideoImg = document.getElementById(data.peerID)?.querySelector('img') as HTMLImageElement
+    console.log(selectVideoImg,data)
+    if(selectVideoImg) {
+        selectVideoImg.style.display = data.videoOpen ? 'none' : 'block'
+    }
+}
+
+
+const sendVideoOpenStatus = (peer: any,call: any) => {
+    const conn = peer.connect(call.peer)
+    conn.on('open',()=> {
+        conn.send({
+            peerID: peer.id,
+            videoOpen: use_roomInfo_Store().isVideoOpen
+        })
+    })
+}
 //  ################## type ##################  //
+
+type dataTransferType = {
+    peerID: string, 
+    videoOpen: boolean
+}
 
 interface initSettingsType {
     peer: any, 
