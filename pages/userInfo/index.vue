@@ -44,10 +44,19 @@
 import { useAuthStore } from '@/stores/authStore'
 import { uploadFile, deleteAllFolderFiles } from '@/utils/firebase/useStorage'
 import { updateUserInfo } from '@/utils/firebase/auth'
+import { storeToRefs } from 'pinia'
 
-const newDisplayName = ref('')
+const { photoURL } = storeToRefs(useAuthStore())
+watch(photoURL, () => {
+    if(photoURL.value) {
+        displayImgSrc.value = photoURL.value
+    }
+})
+
+const newDisplayName = ref('') as Ref<string | null>
 const hasDisplayName = computed(() => {
     const userDisplayName = useAuthStore().displayName
+    newDisplayName.value = userDisplayName
     return userDisplayName ? true : false
 })
 

@@ -42,6 +42,7 @@
 <script setup lang="ts">
     import { emailRules, passwordValid} from '@/utils/login/inputValidation'
     import { loginWithMailAndPwd } from '@/utils/firebase/auth'
+    import { useAuthStore } from '@/stores/authStore'
 
     const inputEmail = ref('')
     const inputPassword = ref('')
@@ -59,7 +60,14 @@
         }
 
         const router = useRouter()
-        await apiService(() => loginWithMailAndPwd(inputEmail.value,inputPassword.value,()=> router.push('/room')))
+        await apiService(() => loginWithMailAndPwd(
+                inputEmail.value,
+                inputPassword.value,
+                ()=> {
+                    if(!useAuthStore().displayName) return router.push('/userInfo')
+                    return router.push('/room')
+                }
+            ))
     }
 
 </script>
