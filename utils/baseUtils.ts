@@ -1,7 +1,7 @@
 import type { Ref } from 'vue'
 import { use_roomInfo_Store } from '@/stores/roomInfoStore'
 
-export const getUserMedia = (constraints: mediaConstraintsType):Promise<any> => {
+export const getUserMedia = (constraints: mediaConstraintsType):Promise<MediaStream> => {
     return navigator.mediaDevices
     .getUserMedia(constraints)
     .then((stream) => {
@@ -48,20 +48,27 @@ export const toggleStreamOutput = (
     }
 
 
-export const enumerateAllSource = () => {
+export const enumerateAllSource = (allVideoInput: Ref<MediaDeviceInfo[]>, allMicroInput: Ref<MediaDeviceInfo[]>) => {
     if (!navigator.mediaDevices?.enumerateDevices) {
         console.log("enumerateDevices() not supported.");
     } else {
+    const saveDeviceList: object[] = []
     // List cameras and microphones.
-    navigator.mediaDevices
+    return navigator.mediaDevices
         .enumerateDevices()
         .then((devices) => {
-        devices.forEach((device) => {
-            console.log(`${device.kind}: ${device.label} id = ${device.deviceId}`);
-        });
+            devices.forEach((device) => {
+                saveDeviceList.push(device)
+                if(device.kind === 'videoinput') {
+                    allVideoInput.value.push(device)
+                }
+                if(device.kind === 'audioinput') {
+                    allMicroInput.value.push(device)
+                }
+            });
         })
         .catch((err) => {
-        console.error(`${err.name}: ${err.message}`);
+            console.error(`${err.name}: ${err.message}`);
         });
     }
 }
@@ -70,6 +77,6 @@ export const enumerateAllSource = () => {
 // ############## type  ############## //
 
 interface mediaConstraintsType {
-    audio: boolean
-    video: boolean | { facingMode : string | object }
+    audio: boolean | {deviceId: { exact: string }}
+    video: boolean | { facingMode : string | object } | {deviceId: { exact: string }}
 }

@@ -13,7 +13,10 @@
                         muted
                         playsinline
                     />
-                    <img v-if="!videoActiveRef" class="video_BGimage" src="@/assets/image/laughFace.avif" alt="">
+                    <div v-if="!videoActiveRef" class="BGImage_wrapper">
+                        <img class="video_BGimage" :src="userImg" alt="">
+                    </div>
+                    <div class="myName">{{ displayName }}</div>
                 </div>
             </div>
         </section>
@@ -35,8 +38,13 @@
                 </template>
                 開啟視訊
             </v-btn>
-            <v-btn stacked prepend-icon="mdi-monitor-share" variant="tonal" >
-                分享畫面
+            <v-btn 
+                @click="isEnumrateDeviceDialog = true"
+                stacked 
+                prepend-icon="mdi-cog-transfer-outline" 
+                variant="tonal" 
+            >
+                設備切換
             </v-btn>
             <v-btn stacked prepend-icon="mdi-dots-vertical" variant="tonal" >
                 更多功能
@@ -65,13 +73,58 @@
                 </v-btn>
             </v-card-actions>
         </v-dialog>
+        <v-dialog
+            v-model="isEnumrateDeviceDialog"
+            transition="dialog-bottom-transition"
+            width="auto"
+        >
+            <v-card>
+                <v-card-text class="!p-0">
+                    <v-card>
+                        <v-tabs
+                            v-model="nowTab"
+                            bg-color="primary"
+                        >
+                            <v-tab value="videoDevice">視訊裝置</v-tab>
+                            <v-tab value="audioDevice">音訊裝置</v-tab>
+                        </v-tabs>
+                        <v-card-text>
+                            <v-window v-model="nowTab">
+                                <v-window-item value="videoDevice">
+                                    <v-radio-group v-model="chooseVideoDevice.newChoose">
+                                        <v-radio 
+                                            v-for="device in allVideoInput" 
+                                            :label="device.label" 
+                                            :value="device.deviceId"
+                                        />
+                                    </v-radio-group>
+                                </v-window-item>
+
+                                <v-window-item value="audioDevice">
+                                    <v-radio-group v-model="chooseAudioSource.newChoose">
+                                        <v-radio 
+                                            v-for="device in allMicroInput" 
+                                            :label="device.label" 
+                                            :value="device.deviceId"
+                                        />
+                                    </v-radio-group>
+                                </v-window-item>
+                            </v-window>
+                        </v-card-text>
+                    </v-card>
+                    <v-card-actions>
+                        <v-btn color="primary" block @click="confirmChangeDevice">確定</v-btn>
+                    </v-card-actions>
+                </v-card-text>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
 
 <script lang="ts" setup>
     import { checkIsRTDBData } from '@/utils/firebase/useRTDB'
-    import { getUserMedia, toggleStreamOutput } from '@/utils/baseUtils'
+    import { getUserMedia, toggleStreamOutput, enumerateAllSource } from '@/utils/baseUtils'
     import { useAuthStore } from '@/stores/authStore'
     import { use_roomInfo_Store } from '@/stores/roomInfoStore'
     import { Peer } from "peerjs";
@@ -87,7 +140,6 @@
     const roomPathSplit = useRoute().path.split('_')
     const baseRoomURL   = roomPathSplit[0] + "/" + roomPathSplit[1]
     const checkRoomPath = baseRoomURL + '/isRoom'
-    const userRoomPath  = baseRoomURL + '/uuidList'
 
 
     // @ 檢查是否有該房間
@@ -185,7 +237,6 @@
 
 
     // @ call function
-    // TODO call other的邏輯處理
     const videoIDList: string[] = []
     const callAllOtherUser = (roomPeerList: string[]) => {
         console.log(roomPeerList,'roomPeerList!!@@##')
@@ -198,11 +249,34 @@
     }
 
 
+    // @  列出所有音訊、視訊裝置，找出目前使用的裝置
+    const getDeviceSource = async () => {
+        await enumerateAllSource(allVideoInput,allMicroInput)
+        if(myStream) {
+            console.log(allMicroInput.value,'allMicroInput')
+            const nowVideoTrackId = myStream.getVideoTracks()[0].getSettings().deviceId
+            const nowAudioTrackId = myStream.getAudioTracks()[0].getSettings().deviceId
+            chooseVideoDevice.value.newChoose = nowVideoTrackId || ''
+            chooseVideoDevice.value.confirm   = nowVideoTrackId || ''
+            chooseAudioSource.value.newChoose = nowAudioTrackId || ''
+            chooseAudioSource.value.confirm   = nowAudioTrackId || ''
+        }
+    }
+
+
     // @ 畫面事件
     const isSoundConnect = ref(false)
     const videoActiveRef = ref(false)
     const soundActiveRef = ref(false)
     const isDialogOpen = ref(false)
+    const isEnumrateDeviceDialog = ref(false)
+    const nowTab = ref('videoDevice')
+    const chooseVideoDevice = ref({newChoose: '', confirm: ''}) 
+    const chooseAudioSource = ref({newChoose: '', confirm: ''})
+    const allVideoInput = ref([]) as Ref<MediaDeviceInfo[]>
+    const allMicroInput = ref([]) as Ref<MediaDeviceInfo[]>
+
+
     const pressToggleStream = (inputType: 'video' | 'audio') => {
         if(inputType === 'audio' && !isSoundConnect.value) return handleSoundActive()
 
@@ -230,6 +304,37 @@
     }
 
 
+    const confirmChangeDevice = async () => {
+        console.log(chooseAudioSource.value,'audio')
+        const constraints = {
+            video: {deviceId: { exact:  chooseVideoDevice.value.confirm}},
+            audio: {deviceId: { exact:  chooseAudioSource.value.confirm}},
+        }
+        
+        // if(chooseVideoDevice.value.newChoose !== chooseVideoDevice.value.confirm) {
+        //     const newChooseVideoID  = chooseVideoDevice.value.newChoose
+        //     constraints.video.deviceId.exact = newChooseVideoID
+        //     chooseVideoDevice.value.confirm  = newChooseVideoID
+        // }
+
+        // if(chooseAudioSource.value.newChoose !== chooseAudioSource.value.confirm) {
+        //     const newChooseAudioID = chooseAudioSource.value.newChoose
+        //     constraints.audio.deviceId.exact = newChooseAudioID
+        //     chooseAudioSource.value.confirm  = newChooseAudioID
+        // }
+        
+        // TODO 切換視音訊
+        chooseVideoDevice.value.newChoose = chooseVideoDevice.value.confirm
+        chooseAudioSource.value.newChoose = chooseAudioSource.value.confirm
+        // myStream = await getUserMedia(constraints)
+        // Object.values(peer.connections).forEach((conn: any)=> { 
+        //     console.log(conn[0].peerConnection.getSenders())
+        //     conn[0].peerConnection.getSenders().replace
+        // })
+        isEnumrateDeviceDialog.value = false
+    }
+
+
     const audioIcon = computed(()=> {
         if(isSoundConnect.value) {
             return soundActiveRef.value ? 'mdi-microphone-outline' : 'mdi-microphone-off'
@@ -246,6 +351,18 @@
             return 'red'
         }
     })
+
+
+    const displayName = computed(()=> {
+        return useAuthStore().displayName
+    })
+
+
+    const userImg = computed(()=> {
+        const saveURL = useAuthStore().photoURL
+        const userImgurl = saveURL ? saveURL : 'https://source.unsplash.com/random/1920x1081'
+        return userImgurl
+    })
     
     // @ main function
     const initRoomEnter = async () => {
@@ -254,9 +371,10 @@
         if(!isRommValid || !isLogin) return useRouter().replace('/room')
         await startPeer()
         await startWebSocket()
-        
+        await getDeviceSource()
     }
-    initRoomEnter()
+    apiService(initRoomEnter)
+    
 </script>
 
 <style lang="scss" scoped>
@@ -264,11 +382,30 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
 
-        .video_BGimage{
+        .BGImage_wrapper{
             position: absolute;
             top: 50%;
             left: 0;
             transform: translateY(-50%);
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            z-index: 2;
+            .video_BGimage{
+                width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+            }
+        }
+
+        .myName{
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background-color: black;
+            color: white;
+            padding: 2px;
+            z-index: 2;
         }
     }
 
