@@ -128,7 +128,7 @@
     import { useAuthStore } from '@/stores/authStore'
     import { use_roomInfo_Store } from '@/stores/roomInfoStore'
     import { Peer } from "peerjs";
-    import { initPeerSettings, listenPeerEvent, addVideoStream } from '@/utils/connection/peerjsUtils'
+    import { initPeerSettings, listenPeerEvent, addVideoStream, sendVideoOpenStatus } from '@/utils/connection/peerjsUtils'
     import { storeToRefs } from 'pinia'
     import { initSocketSetting, joinRoomEmit, toggleBackground } from '@/utils/connection/SocketIO_Utils'
     // @ts-ignore
@@ -244,6 +244,7 @@
             const call = peer.call(eachPeer, myStream)
             call.on("stream", (remoteStream:MediaStream) => {
                 addVideoStream({remoteStream,videoIDList,call,isConnectAudioRef: isSoundConnect})
+                sendVideoOpenStatus(peer,call,'after')
             })
         }) 
     }
@@ -400,9 +401,10 @@
 
         .myName{
             position: absolute;
-            bottom: 5px;
-            right: 5px;
+            bottom: 0px;
+            right: 0px;
             background-color: black;
+            max-width: 60px;
             color: white;
             padding: 2px;
             z-index: 2;
