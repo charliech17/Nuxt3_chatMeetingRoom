@@ -2,12 +2,14 @@
     <div>
         <div>{{hasDisplayName ? '更新' :'設定' }}個人資料</div>
         <v-text-field 
+            class="displayNameStyle"
             :rules="[(inputName)=> !inputName.value || '尚未輸入名稱']"
             v-model="newDisplayName"
             label="顯示名稱"
             prepend-icon="mdi-account"
         />
         <v-file-input
+            class="fileInputStyle"
             :rules="fileRules"
             v-model="imgFile"
             @change="inputImgFile"
@@ -20,9 +22,10 @@
         />
         <div>
             <div>
-                目前的圖片，新增後的圖片後顯示如下:
+                {{hasDisplayName ? '目前的圖片:' : '上傳圖片後顯示在下方框格內'}}
             </div>
             <v-img
+                max-height="150px"
                 :src="displayImgSrc"
                 width="100%"
                 class="bg-grey-lighten-2 mt-4"
@@ -31,10 +34,13 @@
         <v-btn
         class="mt-4"
             block
-            prepend-icon="mdi-vuetify" 
+            prepend-icon="mdi-check-outline" 
             variant="tonal"
             @click="confirmData"
         >
+            <template v-slot:prepend>
+                <v-icon :color="'green'"/>
+            </template>
             確認資訊
         </v-btn>
     </div>
@@ -47,11 +53,16 @@ import { updateUserInfo } from '@/utils/firebase/auth'
 import { storeToRefs } from 'pinia'
 
 const { photoURL } = storeToRefs(useAuthStore())
-watch(photoURL, () => {
-    if(photoURL.value) {
-        displayImgSrc.value = photoURL.value
-    }
-})
+const displayImgSrc = ref('https://picsum.photos/350/165?random') as Ref<string>
+if(photoURL.value) {
+    displayImgSrc.value = photoURL.value 
+} else {
+    watch(photoURL, () => {
+        if(photoURL.value) {
+            displayImgSrc.value = photoURL.value
+        }
+    })
+}
 
 const newDisplayName = ref('') as Ref<string | null>
 const hasDisplayName = computed(() => {
@@ -61,7 +72,6 @@ const hasDisplayName = computed(() => {
 })
 
 
-const displayImgSrc = ref('https://picsum.photos/350/165?random') as Ref<string>
 const imgFile = ref([]) as Ref<File[]>
 const maxSize = 0.5e6
 
@@ -104,3 +114,12 @@ const fileRules = reactive([
 ])
 
 </script>
+
+<style lang="scss" scoped>
+    .displayNameStyle,
+    .fileInputStyle{
+        :deep(.v-input__prepend){
+            color: rgb(205, 126, 205);
+        }
+    }
+</style>

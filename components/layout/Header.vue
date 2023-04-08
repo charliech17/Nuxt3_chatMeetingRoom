@@ -52,9 +52,9 @@
                 </template>
                 <v-divider></v-divider>
                 <v-list density="compact" nav>
-                    <v-list-item prepend-icon="mdi-home-city" title="Home" value="home"/>
-                    <v-list-item prepend-icon="mdi-account" title="My Account" value="account"/>
-                    <v-list-item prepend-icon="mdi-logout" title="Logout" value="logout" @click="logoutUser"/>
+                    <v-list-item prepend-icon="mdi-home-city" title="首頁" value="home" @click="$router.push('/');isShowDrawer = false; "/>
+                    <v-list-item prepend-icon="mdi-account" title="更改資訊" value="account" @click="changeUserInfo"/>
+                    <v-list-item prepend-icon="mdi-logout" title="登出" value="logout" @click="logoutUser"/>
                 </v-list>
             </v-navigation-drawer>
         </v-layout>
@@ -81,6 +81,13 @@
         return userImgurl
     })
 
+
+    const changeUserInfo = () => {
+        useRouter().push('/userInfo')
+        isShowUserInfo.value = false
+    }
+
+
     const logoutUser = async () => {
         await signOutUser()
         isShowUserInfo.value = false
@@ -99,6 +106,9 @@
         
         :deep(.userInfo_drawer){
             height: fit-content !important;
+            .v-navigation-drawer__content{
+                height: auto;
+            }
         }
     }
 </style>
