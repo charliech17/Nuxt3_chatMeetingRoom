@@ -45,8 +45,8 @@
                     <!-- TODO 更換頭像 title -->
                     <v-list-item
                         lines="two"
-                        prepend-avatar="https://randomuser.me/api/portraits/women/81.jpg"
-                        title="yourName"
+                        :prepend-avatar="userImg"
+                        :title="userName"
                         subtitle="Logged in"
                     />
                 </template>
@@ -72,6 +72,14 @@
     const isShowUserInfo  = ref(false)
     const navigatorItmes  = reactive([])
     const isLogin         = computed(() => useAuthStore().isAuth)
+    const userName = computed(()=> {
+        return useAuthStore().displayName
+    })
+    const userImg = computed(()=> {
+        const saveURL = useAuthStore().photoURL
+        const userImgurl = saveURL ? saveURL : 'https://randomuser.me/api/portraits/women/81.jpg'
+        return userImgurl
+    })
 
     const logoutUser = async () => {
         await signOutUser()

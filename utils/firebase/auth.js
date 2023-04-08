@@ -62,13 +62,15 @@ export const getUserAuthState = () => {
     const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
         if (user) {
+            if(!user.displayName) useRouter().replace('/userInfo')
             // User is signed in, see docs for a list of available properties
             // https://firebase.google.com/docs/reference/js/firebase.User
             // const uid = user.uid;
             const userInfoObj = {
                 uid:user.uid,
                 email:user.email,
-                displayName:user.displayName
+                displayName:user.displayName,
+                photoURL: user.photoURL
             }
             useAuthStore().toggleAuthState(true)
             useAuthStore().updateLoginInfo(userInfoObj)
@@ -118,11 +120,12 @@ export const getUserInfo = () => {
 
 
 // @ 更新資訊
-export const updateUserInfo = () => {
+export const updateUserInfo = (displayName,photoURL) => {
     const auth = getAuth();
-    updateProfile(auth.currentUser, {
-    displayName: "Jane Q. User", photoURL: "https://example.com/jane-q-user/profile.jpg"
-    }).then(() => {
+    return updateProfile(
+        auth.currentUser, 
+        { displayName, photoURL}
+    ).then(() => {
     // Profile updated!
     // ...
     }).catch((error) => {

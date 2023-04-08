@@ -7,6 +7,7 @@ export const useAuthStore = defineStore('auth',{
             uid: null,
             email: null,
             displayName: null,
+            photoURL: null,
         }
     },
     getters: {
@@ -20,6 +21,7 @@ export const useAuthStore = defineStore('auth',{
             this.uid   = userInfoObj.uid
             this.email = userInfoObj.email
             this.displayName = userInfoObj.displayName
+            this.photoURL = userInfoObj.photoURL
         }
     },
 })
