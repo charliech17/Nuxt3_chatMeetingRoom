@@ -25,6 +25,7 @@
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.4.1",
     "@types/uuid": "^9.0.1",
-    "nuxt": "^3.2.2"
+    "nuxt": "^3.2.2",
+    "vite-plugin-vuetify": "^1.0.2"
   }
 }
