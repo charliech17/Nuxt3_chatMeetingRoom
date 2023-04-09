@@ -5,7 +5,7 @@
                 <template v-slot:prepend>
                     <v-app-bar-nav-icon :icon="mdiMenu" @click="isShowDrawer = !isShowDrawer"></v-app-bar-nav-icon>
                 </template>
-                <v-app-bar-title @click="$router.push('/room')">
+                <v-app-bar-title @click="navigateTo('/room')">
                     chatApp
                 </v-app-bar-title>
                 <template v-slot:append>
@@ -18,7 +18,7 @@
                         v-else
                         variant="tonal" 
                         class="bg-deep-purple-lighten-5 deep-purple-darken-4" 
-                        @click="$router.push('/login')"
+                        @click="navigateTo('/login')"
                     >
                         登入
                     </v-btn>
@@ -52,7 +52,7 @@
                 </template>
                 <v-divider></v-divider>
                 <v-list density="compact" nav>
-                    <v-list-item :prepend-icon="mdiHomeCity" title="首頁" value="home" @click="$router.push('/');isShowDrawer = false; "/>
+                    <v-list-item :prepend-icon="mdiHomeCity" title="首頁" value="home" @click="handleBackHome"/>
                     <v-list-item :prepend-icon="mdiAccount" title="更改資訊" value="account" @click="changeUserInfo"/>
                     <v-list-item :prepend-icon="mdiLogout" title="登出" value="logout" @click="logoutUser"/>
                 </v-list>
@@ -87,8 +87,20 @@
     })
 
 
+    const handleBackHome = () => {
+        console.log(useRoute().path,'path')
+        if(useRoute().path === '/') {
+            console.log('isHome')
+            isShowDrawer.value = false
+        } else {
+            navigateTo('/');
+            isShowDrawer.value = false
+        }
+    }
+
+
     const changeUserInfo = () => {
-        useRouter().push('/userInfo')
+        navigateTo('/userInfo')
         isShowUserInfo.value = false
     }
 

@@ -34,7 +34,7 @@
         ></v-text-field>
         <div>
             <v-btn class="w-100 mt-4" :prepend-icon="mdiAccount" @click="loginUser">登入</v-btn>
-            <v-btn class="w-100 mt-4" :prepend-icon="mdiAccountMultiplePlusOutline" @click="$router.push('/login/register')">註冊</v-btn>
+            <v-btn class="w-100 mt-4" :prepend-icon="mdiAccountMultiplePlusOutline" @click="navigateTo('/login/register')">註冊</v-btn>
         </div>
     </div>
 </template>

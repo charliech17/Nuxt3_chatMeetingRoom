@@ -381,7 +381,7 @@
     const initRoomEnter = async () => {
         const isLogin = await watchLoginStatus()
         const isRommValid = await checkIsRoomValid()
-        if(!isRommValid || !isLogin) return useRouter().replace('/room')
+        if(!isRommValid || !isLogin) return navigateTo('/room')
         await startPeer()
         await startWebSocket()
         await getDeviceSource()

@@ -35,7 +35,7 @@
         </v-form>
         <div>
             <v-btn class="w-100 mt-4" prepend-icon="mdi-account-circle" :disabled="!isValid" @click="handleRegister">開始註冊</v-btn>
-            <v-btn class="w-100 mt-4" prepend-icon="mdi-account-multiple-plus-outline" @click="$router.push('/login')">前往登入</v-btn>
+            <v-btn class="w-100 mt-4" prepend-icon="mdi-account-multiple-plus-outline" @click="navigateTo('/login')">前往登入</v-btn>
         </div>
     </div>
 </template>
