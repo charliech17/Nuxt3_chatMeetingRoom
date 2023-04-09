@@ -33,8 +33,8 @@
             @update:model-value="(inputTxt)=> handlePasswordInput(inputTxt)"
         ></v-text-field>
         <div>
-            <v-btn class="w-100 mt-4" prepend-icon="mdi-account-circle" @click="loginUser">登入</v-btn>
-            <v-btn class="w-100 mt-4" prepend-icon="mdi-account-multiple-plus-outline" @click="$router.push('/login/register')">註冊</v-btn>
+            <v-btn class="w-100 mt-4" :prepend-icon="mdiAccount" @click="loginUser">登入</v-btn>
+            <v-btn class="w-100 mt-4" :prepend-icon="mdiAccountMultiplePlusOutline" @click="$router.push('/login/register')">註冊</v-btn>
         </div>
     </div>
 </template>
@@ -43,6 +43,8 @@
     import { emailRules, passwordValid} from '@/utils/login/inputValidation'
     import { loginWithMailAndPwd } from '@/utils/firebase/auth'
     import { useAuthStore } from '@/stores/authStore'
+    import mdiAccount from '~icons/mdi/account'
+    import mdiAccountMultiplePlusOutline from '~icons/mdi/account-multiple-plus-outline'
 
     const inputEmail = ref('')
     const inputPassword = ref('')

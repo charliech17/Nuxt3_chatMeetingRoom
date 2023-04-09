@@ -6,6 +6,7 @@ export default defineNuxtConfig({
         '@nuxtjs/tailwindcss',
         '@pinia/nuxt',
         '@vueuse/nuxt',
+        ['unplugin-icons/nuxt', { /* options */ }],
         async (options, nuxt) => {
             nuxt.hooks.hook('vite:extendConfig', (config) => {
               config?.plugins?.push(vuetify());
@@ -14,7 +15,6 @@ export default defineNuxtConfig({
     ],
     css: [
         'vuetify/lib/styles/main.sass',
-        '@mdi/font/css/materialdesignicons.min.css',
     ],
     build: {
         transpile: ['vuetify'],

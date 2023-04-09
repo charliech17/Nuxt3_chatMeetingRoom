@@ -32,7 +32,7 @@
                 </template>
                 連接音訊
             </v-btn>
-            <v-btn stacked :prepend-icon="videoActiveRef ? 'mdi-video-outline' : 'mdi-video-off'" variant="tonal" @click="() => pressToggleStream('video')">
+            <v-btn stacked :prepend-icon="videoActiveRef ? roomIconsCollections.mdiVideoOutline : roomIconsCollections.mdiVideoOff" variant="tonal" @click="() => pressToggleStream('video')">
                 <template v-slot:prepend>
                     <v-icon :color="videoActiveRef ? '' : 'red'"></v-icon>
                 </template>
@@ -41,12 +41,16 @@
             <v-btn 
                 @click="isEnumrateDeviceDialog = true"
                 stacked 
-                prepend-icon="mdi-cog-transfer-outline" 
+                :prepend-icon="roomIconsCollections.mdiCogTransferOutline" 
                 variant="tonal" 
             >
                 設備切換
             </v-btn>
-            <v-btn stacked prepend-icon="mdi-dots-vertical" variant="tonal" >
+            <v-btn 
+                stacked 
+                :prepend-icon="roomIconsCollections.mdiDotsVertical" 
+                variant="tonal" 
+            >
                 更多功能
             </v-btn>
         </section>
@@ -56,7 +60,8 @@
             content-class="bg-white"
         >
             <v-card-text>
-                是否連接音訊?
+                <span class="mr-2">是否連接音訊?</span>
+                <v-icon :icon="roomIconsCollections.mdiVolumeSource" color="#7E57C2"/>
             </v-card-text>
             <v-card-actions>
                 <v-btn 
@@ -93,6 +98,9 @@
                                 <v-window-item value="videoDevice">
                                     <v-radio-group v-model="chooseVideoDevice.newChoose">
                                         <v-radio 
+                                            color="primary"
+                                            :true-icon="roomIconsCollections.mdiRadioboxMarked"
+                                            :false-icon="roomIconsCollections.mdiRadioboxBlank"
                                             v-for="device in allVideoInput" 
                                             :label="device.label" 
                                             :value="device.deviceId"
@@ -103,6 +111,9 @@
                                 <v-window-item value="audioDevice">
                                     <v-radio-group v-model="chooseAudioSource.newChoose">
                                         <v-radio 
+                                            color="primary"
+                                            :true-icon="roomIconsCollections.mdiRadioboxMarked"
+                                            :false-icon="roomIconsCollections.mdiRadioboxBlank"
                                             v-for="device in allMicroInput" 
                                             :label="device.label" 
                                             :value="device.deviceId"
@@ -131,6 +142,7 @@
     import { initPeerSettings, listenPeerEvent, addVideoStream, sendVideoOpenStatus } from '@/utils/connection/peerjsUtils'
     import { storeToRefs } from 'pinia'
     import { initSocketSetting, joinRoomEmit, toggleBackground } from '@/utils/connection/SocketIO_Utils'
+    import { roomIconsCollections } from '@/utils/icons/roomIconUtils'
     // @ts-ignore
     import { v4 as uuidv4 } from 'uuid';
 
@@ -338,9 +350,9 @@
 
     const audioIcon = computed(()=> {
         if(isSoundConnect.value) {
-            return soundActiveRef.value ? 'mdi-microphone-outline' : 'mdi-microphone-off'
+            return soundActiveRef.value ? roomIconsCollections.mdiMicrophoneOutline : roomIconsCollections.mdiMicrophoneOff
         } else {
-            return 'mdi-volume-off'
+            return roomIconsCollections.mdiVolumeOff
         }
     })
 

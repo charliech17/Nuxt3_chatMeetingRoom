@@ -6,14 +6,14 @@
             :rules="[(inputName)=> !inputName.value || '尚未輸入名稱']"
             v-model="newDisplayName"
             label="顯示名稱"
-            prepend-icon="mdi-account"
+            :prepend-icon="mdiAccount"
         />
         <v-file-input
             class="fileInputStyle"
             :rules="fileRules"
             v-model="imgFile"
             @change="inputImgFile"
-            prepend-icon="mdi-camera"
+            :prepend-icon="mdiCamera"
             accept="image/*"
             clearable
             show-size
@@ -34,7 +34,7 @@
         <v-btn
         class="mt-4"
             block
-            prepend-icon="mdi-check-outline" 
+            :prepend-icon="mdiCheckOutline" 
             variant="tonal"
             @click="confirmData"
         >
@@ -51,6 +51,9 @@ import { useAuthStore } from '@/stores/authStore'
 import { uploadFile, deleteAllFolderFiles } from '@/utils/firebase/useStorage'
 import { updateUserInfo } from '@/utils/firebase/auth'
 import { storeToRefs } from 'pinia'
+import mdiAccount from '~icons/mdi/account'
+import mdiCamera  from '~icons/mdi/camera'
+import mdiCheckOutline from '~icons/mdi/check-outline'
 
 const { photoURL } = storeToRefs(useAuthStore())
 const displayImgSrc = ref('https://picsum.photos/350/165?random') as Ref<string>

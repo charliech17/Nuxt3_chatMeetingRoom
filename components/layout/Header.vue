@@ -3,14 +3,14 @@
         <v-layout class="headerSection">
             <v-app-bar class="position-static" color="primary">
                 <template v-slot:prepend>
-                    <v-app-bar-nav-icon @click="isShowDrawer = !isShowDrawer"></v-app-bar-nav-icon>
+                    <v-app-bar-nav-icon :icon="mdiMenu" @click="isShowDrawer = !isShowDrawer"></v-app-bar-nav-icon>
                 </template>
                 <v-app-bar-title @click="$router.push('/room')">
                     chatApp
                 </v-app-bar-title>
                 <template v-slot:append>
                     <v-btn 
-                        icon="mdi-account-circle" 
+                        :icon="mdiAccountCircle" 
                         @click="isShowUserInfo = !isShowUserInfo" 
                         v-if="isLogin"
                     />
@@ -52,9 +52,9 @@
                 </template>
                 <v-divider></v-divider>
                 <v-list density="compact" nav>
-                    <v-list-item prepend-icon="mdi-home-city" title="首頁" value="home" @click="$router.push('/');isShowDrawer = false; "/>
-                    <v-list-item prepend-icon="mdi-account" title="更改資訊" value="account" @click="changeUserInfo"/>
-                    <v-list-item prepend-icon="mdi-logout" title="登出" value="logout" @click="logoutUser"/>
+                    <v-list-item :prepend-icon="mdiHomeCity" title="首頁" value="home" @click="$router.push('/');isShowDrawer = false; "/>
+                    <v-list-item :prepend-icon="mdiAccount" title="更改資訊" value="account" @click="changeUserInfo"/>
+                    <v-list-item :prepend-icon="mdiLogout" title="登出" value="logout" @click="logoutUser"/>
                 </v-list>
             </v-navigation-drawer>
         </v-layout>
@@ -67,6 +67,11 @@
 <script setup>
     import { useAuthStore } from '@/stores/authStore'
     import { signOutUser } from '@/utils/firebase/auth'
+    import mdiAccountCircle from '~icons/mdi/account-circle'
+    import mdiHomeCity from '~icons/mdi/home-city'
+    import mdiAccount from '~icons/mdi/account'
+    import mdiLogout from '~icons/mdi/logout'
+    import mdiMenu from '~icons/mdi/menu'
     
     const isShowDrawer    = ref(false)
     const isShowUserInfo  = ref(false)
