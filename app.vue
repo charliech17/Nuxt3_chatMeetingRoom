@@ -14,7 +14,6 @@ import { getUserAuthState } from '@/utils/firebase/auth'
 
 const app  = firebaseInit()
 getUserAuthState()
-//TODO firbase auth
 </script>
 
 <style>
