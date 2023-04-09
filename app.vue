@@ -11,10 +11,13 @@
 <script lang="ts" setup>
 import { firebaseInit } from '@/utils/firebase/firebaseInit'
 import { getUserAuthState } from '@/utils/firebase/auth'
+import { pageChangeLoadingIndicater } from '@/utils/globalComponentControl'
 
 const app  = firebaseInit()
 getUserAuthState()
-//TODO firbase auth
+
+pageChangeLoadingIndicater()
+
 </script>
 
 <style>
