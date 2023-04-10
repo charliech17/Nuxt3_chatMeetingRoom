@@ -5,15 +5,15 @@ export const toggleShowLoading = (isShowLoading: boolean) => {
 }
 
 export const pageChangeLoadingIndicater =  () => {
-    useRouter().beforeEach(()=> {
-        toggleShowLoading(true)
-      })
-      
-    useRouter().afterEach(()=> {
-    toggleShowLoading(true)
-    nextTick(()=> {
-        console.log('stop!!!')
-        toggleShowLoading(false)
-    })
-    })
+    // useRouter().beforeEach(()=> {
+    //     toggleShowLoading(true)
+    // })
+
+    // useRouter().afterEach(()=> {
+    //     toggleShowLoading(true)
+    //     nextTick(()=> {
+    //         console.log('stop!!!')
+    //         toggleShowLoading(false)
+    //     })
+    // })
 }
