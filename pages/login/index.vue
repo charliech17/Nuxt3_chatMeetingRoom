@@ -33,7 +33,7 @@
             @update:model-value="(inputTxt)=> handlePasswordInput(inputTxt)"
         ></v-text-field>
         <div>
-            <v-btn class="w-100 mt-4" :prepend-icon="mdiAccount" @click="loginUser">登入</v-btn>
+            <v-btn class="w-100 mt-4" :prepend-icon="mdiAccountCircle" @click="loginUser">登入</v-btn>
             <v-btn class="w-100 mt-4" :prepend-icon="mdiAccountMultiplePlusOutline" @click="navigateTo('/login/register')">註冊</v-btn>
         </div>
     </div>
@@ -43,7 +43,7 @@
     import { emailRules, passwordValid} from '@/utils/login/inputValidation'
     import { loginWithMailAndPwd } from '@/utils/firebase/auth'
     import { useAuthStore } from '@/stores/authStore'
-    import mdiAccount from '~icons/mdi/account'
+    import mdiAccountCircle from '~icons/mdi/account-circle'
     import mdiAccountMultiplePlusOutline from '~icons/mdi/account-multiple-plus-outline'
 
     const inputEmail = ref('')

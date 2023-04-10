@@ -34,8 +34,8 @@
             ></v-text-field>
         </v-form>
         <div>
-            <v-btn class="w-100 mt-4" prepend-icon="mdi-account-circle" :disabled="!isValid" @click="handleRegister">開始註冊</v-btn>
-            <v-btn class="w-100 mt-4" prepend-icon="mdi-account-multiple-plus-outline" @click="navigateTo('/login')">前往登入</v-btn>
+            <v-btn class="w-100 mt-4" :prepend-icon="mdiAccountMultiplePlusOutline" :disabled="!isValid" @click="handleRegister">開始註冊</v-btn>
+            <v-btn class="w-100 mt-4" :prepend-icon="mdiAccountCircle" @click="navigateTo('/login')">前往登入</v-btn>
         </div>
     </div>
 </template>
@@ -44,6 +44,8 @@
 <script lang="ts" setup>
     import { emailRules, passwordValid} from '@/utils/login/inputValidation'
     import { registorWithMailAndPwd } from '@/utils/firebase/auth'
+    import mdiAccountCircle from '~icons/mdi/account-circle'
+    import mdiAccountMultiplePlusOutline from '~icons/mdi/account-multiple-plus-outline'
 
     const emailAccount = ref('')
     const initPassword = ref('')
