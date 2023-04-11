@@ -1,11 +1,11 @@
 import { io, Socket } from "socket.io-client";
 // TODO update socketIO path
-const config = useRuntimeConfig()
 let socket: Socket<ServerToClientEvents, ClientToServerEvents>  //= //io('http://localhost:4000/'/*config.public.SOCKET_CONNECTION_URL*/);
 
 
 export const initSocketSetting = ({onRemoteConnect,onJoinRoomSuccess,onUserLeave,onOther_BG_Change}:socketInitType) => {
-    socket = io(config.public.SOCKET_CONNECTION_URL);
+    const socketURL = import.meta.env.VITE_SOCKET_CONNECTION_URL as string
+    socket = io(socketURL);
 
     socket.on("connect", () => {
         onRemoteConnect(socket.id)
