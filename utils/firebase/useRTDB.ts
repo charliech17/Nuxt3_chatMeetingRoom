@@ -1,8 +1,7 @@
 import { getDatabase, ref as FireBaseRef } from "firebase/database";
 import { child, push, onValue } from "firebase/database";
 import { get, set, update, remove } from "firebase/database";
-const config = useRuntimeConfig()
-const DB_SERCET = config.public.FIREBASE_RTDB_KEY + "/"
+const DB_SERCET = import.meta.env.VITE_FIREBASE_RTDB_KEY + "/"
 
 
 // @ 讀取資料
