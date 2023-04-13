@@ -31,6 +31,7 @@
 <script lang="ts" setup>
     import { checkIsRTDBData, setRTDBData } from '@/utils/firebase/useRTDB'
     import { useAuthStore } from '@/stores/authStore'
+    import { getSHA256Hash } from '@/utils/baseUtils'
 
     const props = defineProps({
         isFrom: {type: String, required: true},
@@ -41,7 +42,7 @@
 
     const handleMeetingJoin = async () => {
         if(props.isFrom === 'host') {
-            const newMeetingPath = 'room/' + roomCode.value + "/"
+            const newMeetingPath = 'room/' + await getSHA256Hash(roomCode.value) + "/"
             const hostPath       = 'host/' + useAuthStore().uid + "/"//+ new Date().getTime() + "/"
             const isHost     = await checkIsRTDBData(hostPath)
             const isRoomData = await checkIsRTDBData(newMeetingPath)
@@ -66,12 +67,12 @@
                 const hostMeetingInfo = {
                     createTime: new Date().toString(), 
                 } 
-                const setMeetingPath = newMeetingPath + roomPassword.value
-                const enterMeetingPath = '/room/' + roomCode.value + '_' + roomPassword.value
+                const setMeetingPath = newMeetingPath + await getSHA256Hash(roomPassword.value)
+                const enterMeetingPath = '/room/' + await getSHA256Hash(roomCode.value) + '_' + await getSHA256Hash(roomPassword.value)
                 await apiService(async () => {
                     await setRTDBData(setMeetingPath,updateMeetingInfo)
                     await setRTDBData(hostPath,hostMeetingInfo)
-                    useRouter().push(enterMeetingPath)
+                    navigateTo(enterMeetingPath)
                 })
             }
         } else {

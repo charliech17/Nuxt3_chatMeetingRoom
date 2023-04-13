@@ -73,6 +73,16 @@ export const enumerateAllSource = (allVideoInput: Ref<MediaDeviceInfo[]>, allMic
     }
 }
 
+export const getSHA256Hash = async (input: string) => {
+    const textAsBuffer = new TextEncoder().encode(input);
+    const hashBuffer = await window.crypto.subtle.digest("SHA-256", textAsBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hash = hashArray
+        .map((item) => item.toString(16).padStart(4, "0"))
+        .join("")
+        .substring(0,16);
+    return window.btoa(hash);
+};
 
 // ############## type  ############## //
 
