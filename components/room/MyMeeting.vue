@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>{{ '*是否連接? ' + (isRoomInfo ? '是' : '否')  }}</h1>
+        <h1>{{ '*是否有會議? ' + (isRoomInfo ? '是' : '否')  }}</h1>
         <div v-if="isRoomInfo" class="mt-4">
             <h2>*創建時間: {{ roomInfo?.createTime }}</h2>
             <div class="mt-4">
