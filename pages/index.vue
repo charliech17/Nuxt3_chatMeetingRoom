@@ -5,7 +5,19 @@
             <span class="placeholder"></span>
         </div>
     </div>
-    <section>
+    <section class="text-center mt-8">
+        <div class="flex justify-center align-center gap-2">
+            <v-icon color="#8a2be2" :icon="isAuth ? mdiEmoticonOutline : mdiHelpCircleOutline"></v-icon>
+            <h1 class="text-2xl">{{isAuth ? '開始使用' : '有帳號嗎'}}</h1>
+        </div>
+        <div class="mt-4">
+            <v-btn rounded="lg" class="mr-4" v-if="!isAuth" @click="navigateTo('login')">登入</v-btn>
+            <v-btn rounded="lg" v-if="!isAuth" @click="navigateTo('/login/register')">註冊</v-btn>
+            <v-btn rounded="lg" class="mr-4" v-if="isAuth" @click="navigateTo('/room')">前往我的會議</v-btn>
+            <v-btn rounded="lg" v-if="isAuth" @click="navigateTo('/userInfo')">前往更改設定</v-btn>
+        </div>
+    </section>
+    <section class="mt-4">
         <div class="font-sans flex align-top justify-between flex-col md:flex-row px-10 md:px-20 md:gap-x-4 intoColorStyle">
             <div class="mt-8 md:flex-1" v-for="(parameter,index) in topAttractiveParamenters" :key="index">
                 <img
@@ -29,6 +41,10 @@
 
 
 <script lang="ts" setup>
+    import { useAuthStore } from '@/stores/authStore'
+    import mdiEmoticonOutline from '~icons/mdi/emoticon-outline'
+    import mdiHelpCircleOutline from '~icons/mdi/help-circle-outline'
+
     const topAttractiveParamenters = reactive([
         {
             imgPath: new URL('@/assets/image/icon/index_easy.png', import.meta.url).href,
@@ -47,9 +63,17 @@
         }
     ])
     document.body.style.backgroundColor = '#EDE7F6'
+    document.body.style.color = '#333333'
     
-    onBeforeRouteLeave(()=> {
+    
+    const isAuth = computed(()=> {
+        return useAuthStore().isAuth
+    })
+
+
+    onUnmounted(()=> {
         document.body.style.backgroundColor = ''
+        document.body.style.color = ''
     })
 </script>
 

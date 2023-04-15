@@ -5,7 +5,7 @@
                 <template v-slot:prepend>
                     <v-app-bar-nav-icon :icon="headerMdiIcons.mdiMenu" @click="isShowDrawer = !isShowDrawer"></v-app-bar-nav-icon>
                 </template>
-                <v-app-bar-title @click="navigateTo('/room')">
+                <v-app-bar-title @click="navigateTo('/')">
                     chatApp
                 </v-app-bar-title>
                 <template v-slot:append>
@@ -71,7 +71,6 @@
     
     const isShowDrawer    = ref(false)
     const isShowUserInfo  = ref(false)
-    const navigatorItmes  = reactive([])
     const isLogin         = computed(() => useAuthStore().isAuth)
     const userName = computed(()=> {
         const getUserName = useAuthStore().displayName
