@@ -3,14 +3,14 @@
         <v-layout class="headerSection">
             <v-app-bar class="position-static" color="primary">
                 <template v-slot:prepend>
-                    <v-app-bar-nav-icon :icon="mdiMenu" @click="isShowDrawer = !isShowDrawer"></v-app-bar-nav-icon>
+                    <v-app-bar-nav-icon :icon="headerMdiIcons.mdiMenu" @click="isShowDrawer = !isShowDrawer"></v-app-bar-nav-icon>
                 </template>
                 <v-app-bar-title @click="navigateTo('/room')">
                     chatApp
                 </v-app-bar-title>
                 <template v-slot:append>
                     <v-btn 
-                        :icon="mdiAccountCircle" 
+                        :icon="headerMdiIcons.mdiAccountCircle" 
                         @click="isShowUserInfo = !isShowUserInfo" 
                         v-if="isLogin"
                     />
@@ -31,9 +31,9 @@
                 temporary
                 :absolute="true"
             >
-                <v-list
-                :items="navigatorItmes"
-                ></v-list>
+                <v-list-item class="py-5 clickEffect" :prepend-icon="headerMdiIcons.mdiAccountGroup" title="前往會議資訊" value="room" @click="()=>handleMenuDraweItems('room')"/>
+                <v-list-item class="py-5 clickEffect" :prepend-icon="headerMdiIcons.mdiBookEducationOutline" title="前往使用說明" value="education" @click="()=>handleMenuDraweItems('education')"/>
+                <v-list-item class="py-5 clickEffect" :prepend-icon="headerMdiIcons.mdiCurrencyUsd" title="贊助" value="sponser" @click="()=>handleMenuDraweItems('sponser')"/>
             </v-navigation-drawer>
             <v-navigation-drawer
                 v-model="isShowUserInfo"
@@ -52,9 +52,9 @@
                 </template>
                 <v-divider></v-divider>
                 <v-list density="compact" nav>
-                    <v-list-item :prepend-icon="mdiHomeCity" title="首頁" value="home" @click="handleBackHome"/>
-                    <v-list-item :prepend-icon="mdiAccount" title="更改資訊" value="account" @click="changeUserInfo"/>
-                    <v-list-item :prepend-icon="mdiLogout" title="登出" value="logout" @click="logoutUser"/>
+                    <v-list-item :prepend-icon="headerMdiIcons.mdiHomeCity" title="首頁" value="home" @click="handleBackHome"/>
+                    <v-list-item :prepend-icon="headerMdiIcons.mdiAccount" title="更改資訊" value="account" @click="changeUserInfo"/>
+                    <v-list-item :prepend-icon="headerMdiIcons.mdiLogout" title="登出" value="logout" @click="logoutUser"/>
                 </v-list>
             </v-navigation-drawer>
         </v-layout>
@@ -64,21 +64,18 @@
     </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
     import { useAuthStore } from '@/stores/authStore'
     import { signOutUser } from '@/utils/firebase/auth'
-    import mdiAccountCircle from '~icons/mdi/account-circle'
-    import mdiHomeCity from '~icons/mdi/home-city'
-    import mdiAccount from '~icons/mdi/account'
-    import mdiLogout from '~icons/mdi/logout'
-    import mdiMenu from '~icons/mdi/menu'
+    import { headerMdiIcons } from '@/utils/icons/HeaderIconUtils'
     
     const isShowDrawer    = ref(false)
     const isShowUserInfo  = ref(false)
     const navigatorItmes  = reactive([])
     const isLogin         = computed(() => useAuthStore().isAuth)
     const userName = computed(()=> {
-        return useAuthStore().displayName
+        const getUserName = useAuthStore().displayName
+        return getUserName ? getUserName : ''
     })
     const userImg = computed(()=> {
         const saveURL = useAuthStore().photoURL
@@ -111,6 +108,26 @@
         useRouter().replace('/')
     }
 
+
+    const handleMenuDraweItems = async (triggerItems: 'room' | 'education' | 'sponser' ) => {
+        switch(triggerItems) {
+            case 'room' :
+                navigateTo('/room')
+                isShowDrawer.value = false
+                break
+            case 'education':
+                isShowDrawer.value = false
+                // TODO 導至教學頁面
+                alert('敬請期待')
+                break
+            case 'sponser':
+                isShowDrawer.value = false
+                // TODO 導至贊助頁面
+                alert('敬請期待')
+                break
+        }
+    }
+
 </script>
 
 <style lang="scss" scoped>
@@ -125,6 +142,16 @@
             height: fit-content !important;
             .v-navigation-drawer__content{
                 height: auto;
+            }
+        }
+
+        :deep(.menu_drawer) {
+            .clickEffect {
+                &:hover,
+                &:active{
+                    background: #EDE7F6;
+                    color: #4527A0;
+                }
             }
         }
     }
