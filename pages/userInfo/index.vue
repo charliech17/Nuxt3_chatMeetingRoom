@@ -76,7 +76,7 @@ const hasDisplayName = computed(() => {
 
 
 const imgFile = ref([]) as Ref<File[]>
-const maxSize = 0.5e6
+const maxSize = 3e6
 
 
 const inputImgFile = () => {
