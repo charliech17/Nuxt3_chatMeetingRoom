@@ -22,6 +22,7 @@
             <RoomMeetingInfoInput :isFrom="'guest'" v-if="isShowInput">
                 <template v-slot:meetingCode>輸入會議代碼</template>
                 <template v-slot:meetingPassword>輸入會議密碼</template>
+                <template v-slot:meetingBtn>進入會議</template>
             </RoomMeetingInfoInput>
         </section>
     </div>
