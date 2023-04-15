@@ -1,5 +1,7 @@
 import type { Ref } from 'vue'
 import { use_roomInfo_Store } from '@/stores/roomInfoStore'
+import { useAuthStore } from '@/stores/authStore'
+import { storeToRefs } from 'pinia'
 
 export const getUserMedia = (constraints: mediaConstraintsType):Promise<MediaStream> => {
     return navigator.mediaDevices
@@ -84,6 +86,24 @@ export const getSHA256Hash = async (input: string) => {
     return window.btoa(hash);
 };
 
+
+export const watchLoginStatus = async () => {
+    // 確定登入狀態
+    const authStore = useAuthStore()
+    if(authStore.isAuth === true) return true
+    if(authStore.isAuth === false) return false
+    // 尚未確定登入狀態(authStore.isAuth 目前為null時執行下面程式)
+    const { isAuth } = storeToRefs(authStore)
+    return new Promise((resolve) => {
+        watch(isAuth,(newAuth) => {
+            if(newAuth === false) {
+                return resolve(false)
+            } else if(newAuth === true) {
+                return resolve(true)
+            }
+        })
+    })
+}
 // ############## type  ############## //
 
 interface mediaConstraintsType {

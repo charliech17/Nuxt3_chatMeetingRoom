@@ -156,6 +156,7 @@ export const signOutUser = () => {
     const auth = getAuth();
     return signOut(auth).then(() => {
         useAuthStore().$reset()
+        useAuthStore().toggleAuthState(false)
     }).catch((error) => {
         // TODO An error happened.
         console.log(error)

@@ -135,7 +135,7 @@
 
 <script lang="ts" setup>
     import { checkIsRTDBData } from '@/utils/firebase/useRTDB'
-    import { getUserMedia, toggleStreamOutput, enumerateAllSource } from '@/utils/baseUtils'
+    import { getUserMedia, toggleStreamOutput, enumerateAllSource, watchLoginStatus } from '@/utils/baseUtils'
     import { useAuthStore } from '@/stores/authStore'
     import { use_roomInfo_Store } from '@/stores/roomInfoStore'
     import { Peer } from "peerjs";
@@ -163,26 +163,6 @@
             return false
         }
         return true
-    }
-
-
-    // @ 檢查是否登入
-    const watchLoginStatus = async () => {
-        // 確定登入狀態
-        const authStore = useAuthStore()
-        if(authStore.isAuth === true) return true
-        if(authStore.isAuth === false) return false
-        // 尚未確定登入狀態(authStore.isAuth 目前為null時執行下面程式)
-        const { isAuth } = storeToRefs(authStore)
-        return new Promise((resolve) => {
-            watch(isAuth,(newAuth) => {
-                if(newAuth === false) {
-                    return resolve(false)
-                } else if(newAuth === true) {
-                    return resolve(true)
-                }
-            })
-        })
     }
 
 

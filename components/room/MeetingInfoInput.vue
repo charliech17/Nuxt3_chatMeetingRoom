@@ -69,14 +69,15 @@
             return
         } else {
             // TODO 改成UUID套件，加上會議名稱、主持人名稱
+            const setMeetingPath = newMeetingPath + await getSHA256Hash(roomPassword.value)
+            const enterMeetingPath = '/room/' + await getSHA256Hash(roomCode.value) + '_' + await getSHA256Hash(roomPassword.value)
             const updateMeetingInfo = { 
                 isRoom: true,
             }
             const hostMeetingInfo = {
                 createTime: new Date().toString(), 
+                roomPath: enterMeetingPath,
             } 
-            const setMeetingPath = newMeetingPath + await getSHA256Hash(roomPassword.value)
-            const enterMeetingPath = '/room/' + await getSHA256Hash(roomCode.value) + '_' + await getSHA256Hash(roomPassword.value)
             await apiService(async () => {
                 await setRTDBData(setMeetingPath,updateMeetingInfo)
                 await setRTDBData(hostPath,hostMeetingInfo)

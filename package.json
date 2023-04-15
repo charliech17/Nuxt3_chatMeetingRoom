@@ -17,6 +17,7 @@
     "firebase": "^9.17.2",
     "peerjs": "^1.4.7",
     "pinia": "^2.0.32",
+    "qrcode": "^1.5.1",
     "sass": "^1.58.3",
     "socket.io-client": "^4.6.1",
     "unplugin-icons": "^0.16.1",
