@@ -316,6 +316,9 @@
         }
         
         if(chooseVideoDevice.value.newChoose !== chooseVideoDevice.value.confirm) {
+            // 更新constraints
+            const newChooseVideoID  = chooseVideoDevice.value.newChoose
+            constraints.video.deviceId.exact = newChooseVideoID
             // 停止舊有的stream，並重新getUserMedia
             myStream?.getVideoTracks()[0].stop()
             myStream?.getAudioTracks()[0].stop()
@@ -341,8 +344,6 @@
                 })
             })
             // 更新頁面的選項
-            const newChooseVideoID  = chooseVideoDevice.value.newChoose
-            constraints.video.deviceId.exact = newChooseVideoID
             chooseVideoDevice.value.confirm  = newChooseVideoID
         }
 
