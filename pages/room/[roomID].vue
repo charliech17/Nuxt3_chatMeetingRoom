@@ -106,7 +106,6 @@
                                             :value="device.deviceId"
                                         />
                                     </v-radio-group>
-                                    <div class="ml-2">注意，切換視訊裝置後，瀏覽器會重新整理</div>
                                 </v-window-item>
 
                                 <v-window-item value="audioDevice">
@@ -142,7 +141,6 @@
     import { use_roomInfo_Store } from '@/stores/roomInfoStore'
     import { Peer } from "peerjs";
     import { initPeerSettings, listenPeerEvent, addVideoStream, sendVideoOpenStatus } from '@/utils/connection/peerjsUtils'
-    import { storeToRefs } from 'pinia'
     import { initSocketSetting, joinRoomEmit, toggleBackground } from '@/utils/connection/SocketIO_Utils'
     import { roomIconsCollections } from '@/utils/icons/roomIconUtils'
     // @ts-ignore
@@ -190,10 +188,6 @@
         const constraints: MediaStreamConstraints = {
             audio: true,
             video: { facingMode: "user" },
-        }
-        if(localStorage['videoDeviceID']) {
-            constraints.video = {deviceId: { exact: localStorage['videoDeviceID'] }}
-            localStorage.removeItem('videoDeviceID')
         }
         const stream = await getUserMedia(constraints)
         const myVideo = myMedia_display.value as HTMLVideoElement | null
@@ -316,17 +310,41 @@
 
 
     const confirmChangeDevice = async () => {
-        console.log(chooseAudioSource.value,'audio')
         const constraints = {
-            video: {deviceId: { exact:  chooseVideoDevice.value.confirm}},
-            audio: {deviceId: { exact:  chooseAudioSource.value.confirm}},
+            video: {deviceId: { exact:  ''}},
+            audio: true,//{deviceId: { exact:  chooseAudioSource.value.confirm}},
         }
         
-        // if(chooseVideoDevice.value.newChoose !== chooseVideoDevice.value.confirm) {
-        //     const newChooseVideoID  = chooseVideoDevice.value.newChoose
-        //     constraints.video.deviceId.exact = newChooseVideoID
-        //     chooseVideoDevice.value.confirm  = newChooseVideoID
-        // }
+        if(chooseVideoDevice.value.newChoose !== chooseVideoDevice.value.confirm) {
+            // 停止舊有的stream，並重新getUserMedia
+            myStream?.getVideoTracks()[0].stop()
+            myStream?.getAudioTracks()[0].stop()
+            myStream = await getUserMedia(constraints)
+            // 更新自己螢幕的stream
+            const myVideo = document.getElementById('myVideo') as HTMLVideoElement
+            if(myVideo) {
+                myVideo.srcObject = myStream
+                videoActiveRef.value = true
+                soundActiveRef.value = true
+            }
+            // 替換peer的stream(從peer的connections物件去取值)
+            Object.values(peer.connections).forEach((conn: any)=> { 
+                const rtcSender = conn[0].peerConnection.getSenders()
+                rtcSender.forEach((eachSender: any) => {
+                    console.log(eachSender,'eachSender')
+                    if(eachSender.track.kind === 'audio') {
+                        eachSender.replaceTrack(myStream?.getAudioTracks()[0])
+                    } else if(eachSender.track.kind === 'video')  {
+                        console.log(eachSender,'eachSender')
+                        eachSender.replaceTrack(myStream?.getVideoTracks()[0])
+                    }
+                })
+            })
+            // 更新頁面的選項
+            const newChooseVideoID  = chooseVideoDevice.value.newChoose
+            constraints.video.deviceId.exact = newChooseVideoID
+            chooseVideoDevice.value.confirm  = newChooseVideoID
+        }
 
         // if(chooseAudioSource.value.newChoose !== chooseAudioSource.value.confirm) {
         //     const newChooseAudioID = chooseAudioSource.value.newChoose
@@ -334,19 +352,8 @@
         //     chooseAudioSource.value.confirm  = newChooseAudioID
         // }
         
-        // TODO 切換視音訊
-        if(chooseVideoDevice.value.newChoose !== chooseVideoDevice.value.confirm) {
-            localStorage['videoDeviceID'] = chooseVideoDevice.value.newChoose
-            return location.reload()
-        }
-
-        chooseVideoDevice.value.newChoose = chooseVideoDevice.value.confirm
+        // 因麥克風只顯示active裝置，不能切換，故若使用者切換需改回原本的值
         chooseAudioSource.value.newChoose = chooseAudioSource.value.confirm
-        // myStream = await getUserMedia(constraints)
-        // Object.values(peer.connections).forEach((conn: any)=> { 
-        //     console.log(conn[0].peerConnection.getSenders())
-        //     conn[0].peerConnection.getSenders().replace
-        // })
         isEnumrateDeviceDialog.value = false
     }
 
