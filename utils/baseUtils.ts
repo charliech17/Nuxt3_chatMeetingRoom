@@ -104,4 +104,12 @@ export const watchLoginStatus = async () => {
         })
     })
 }
+
+export const checkNeedReloadPage = () => {
+    useRouter().afterEach((to,from)=> {
+        if(from.path.includes('room/') && !to.path.includes('room/')) {
+            location.reload()
+        } 
+    })
+}
 // ############## type  ############## //

@@ -12,11 +12,13 @@
 import { firebaseInit } from '@/utils/firebase/firebaseInit'
 import { getUserAuthState } from '@/utils/firebase/auth'
 import { pageChangeLoadingIndicater } from '@/utils/globalComponentControl'
+import { checkNeedReloadPage } from '@/utils/baseUtils'
 
 const app  = firebaseInit()
 getUserAuthState()
 
 pageChangeLoadingIndicater()
+checkNeedReloadPage()
 
 </script>
 

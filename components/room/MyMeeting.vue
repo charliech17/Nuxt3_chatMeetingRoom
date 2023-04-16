@@ -9,6 +9,21 @@
             </div>
             <v-btn :prepend-icon="mdiShare" color="purple-darken-4" class="mt-4 text-purple-lighten-3" block>分享會議連接</v-btn>
             <v-btn :prepend-icon="mdiNavigationVariantOutline" class="mt-4" block @click="navigateTo(roomInfo?.roomPath)">前往會議</v-btn>
+            <h3 class="text-red text-center text-lg mt-8">Danger Zone</h3>
+            <v-btn class="mt-2 text-h6" color="red" block @click="isShowAlertDialog = true">刪除此會議</v-btn>
+            <v-dialog
+                v-model="isShowAlertDialog"
+                transition="dialog-bottom-transition"
+                content-class="bg-white p-4"
+                width="auto"
+            >
+                <v-card>
+                    <h2>確定刪除會議?</h2>
+                    <p>若仍有人在會議可能會導致斷訊</p>
+                    <v-btn @click="handleDeleteMeeting">確定刪除</v-btn>
+                    <v-btn @click="isShowAlertDialog = false">關閉彈窗</v-btn>
+                </v-card>
+            </v-dialog>
         </div>
     </div>
 </template>
@@ -24,8 +39,14 @@
     const isRoomInfo = ref<null | boolean>(null)
     const roomInfo = ref<null | {createTime: Date, roomPath: string}>(null)
     const QRCodeURL = ref<string>('')
+    const isShowAlertDialog = ref(false)
     
     
+    const handleDeleteMeeting = () => {
+        alert('TODO 刪除邏輯 彈窗樣式')
+        isShowAlertDialog.value = false
+    }
+
     const setRoomPath = async () => {
         const userRoomPath = 'host/' + useAuthStore().uid
         const getRoomInfo = await getRTDBData(userRoomPath) as {createTime: Date, roomPath: string} | null
@@ -38,6 +59,7 @@
 
         return getRoomInfo
     }
+
 
     const generateQR = async (url: string) => {
         try {
@@ -55,7 +77,7 @@
         if(getRoomInfo){
             const getUrl = window.location;
             const baseUrl = getUrl.protocol + "//" + getUrl.host;
-            await generateQR(baseUrl + '/' + getRoomInfo.roomPath)
+            await generateQR(baseUrl + getRoomInfo.roomPath)
         }
     }
     initMyRoom()
