@@ -106,6 +106,7 @@
                                             :value="device.deviceId"
                                         />
                                     </v-radio-group>
+                                    <div class="ml-2">注意，切換視訊裝置後，瀏覽器會重新整理</div>
                                 </v-window-item>
 
                                 <v-window-item value="audioDevice">
@@ -119,6 +120,7 @@
                                             :value="device.deviceId"
                                         />
                                     </v-radio-group>
+                                    <div class="ml-2">注意: 目前未開放麥克風設備切換，請自行去設備主控台切換</div>
                                 </v-window-item>
                             </v-window>
                         </v-card-text>
@@ -179,11 +181,19 @@
         peer = new Peer(peerUUID)
         await initPeerSettings({peer})
         isConnect.value = true
+    }
 
+
+    // @ 連接視訊
+    const connectUserMedia = async () => {
         // 開始視訊
-        const constraints = {
+        const constraints: MediaStreamConstraints = {
             audio: true,
             video: { facingMode: "user" },
+        }
+        if(localStorage['videoDeviceID']) {
+            constraints.video = {deviceId: { exact: localStorage['videoDeviceID'] }}
+            localStorage.removeItem('videoDeviceID')
         }
         const stream = await getUserMedia(constraints)
         const myVideo = myMedia_display.value as HTMLVideoElement | null
@@ -194,7 +204,12 @@
             soundActiveRef.value = true
             use_roomInfo_Store().setVideoStaus(true)
         }
-        listenPeerEvent({peer,localStream:stream,isConnectAudioRef: isSoundConnect})
+    }
+
+
+    // @ 監聽peer事件
+    const listenerPeerConnect = () => {
+        listenPeerEvent({peer,localStream:myStream,isConnectAudioRef: isSoundConnect})
     }
 
 
@@ -320,6 +335,11 @@
         // }
         
         // TODO 切換視音訊
+        if(chooseVideoDevice.value.newChoose !== chooseVideoDevice.value.confirm) {
+            localStorage['videoDeviceID'] = chooseVideoDevice.value.newChoose
+            return location.reload()
+        }
+
         chooseVideoDevice.value.newChoose = chooseVideoDevice.value.confirm
         chooseAudioSource.value.newChoose = chooseAudioSource.value.confirm
         // myStream = await getUserMedia(constraints)
@@ -366,6 +386,8 @@
         const isRommValid = await checkIsRoomValid()
         if(!isRommValid || !isLogin) return navigateTo('/room')
         await startPeer()
+        await connectUserMedia()
+        listenerPeerConnect()
         await startWebSocket()
         await getDeviceSource()
     }

@@ -3,7 +3,7 @@ import { use_roomInfo_Store } from '@/stores/roomInfoStore'
 import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
 
-export const getUserMedia = (constraints: mediaConstraintsType):Promise<MediaStream> => {
+export const getUserMedia = (constraints: MediaStreamConstraints):Promise<MediaStream> => {
     return navigator.mediaDevices
     .getUserMedia(constraints)
     .then((stream) => {
@@ -105,8 +105,3 @@ export const watchLoginStatus = async () => {
     })
 }
 // ############## type  ############## //
-
-interface mediaConstraintsType {
-    audio: boolean | {deviceId: { exact: string }}
-    video: boolean | { facingMode : string | object } | {deviceId: { exact: string }}
-}
