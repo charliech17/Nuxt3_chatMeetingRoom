@@ -1,6 +1,6 @@
 <template>
     <LayoutHeader/>
-    <main class="mainContentStyle">
+    <main class="mainContentStyle" id="mainContent_scrollSection_ID">
         <slot></slot>
     </main>
 </template>

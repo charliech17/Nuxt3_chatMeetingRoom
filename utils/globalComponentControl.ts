@@ -4,9 +4,20 @@ export const toggleShowLoading = (isShowLoading: boolean) => {
     use_GlobalComponent_Store().toggleShowLoading(isShowLoading)
 }
 
+const endScrolling = (isStart: boolean) => {
+    const scrollSection = document.getElementById('mainContent_scrollSection_ID')
+    if(isStart && scrollSection) {
+        scrollSection.style.overflow = 'hidden'
+    }
+    else if(!isStart &&  scrollSection) {
+        scrollSection.style.overflow = ''
+    }
+}
+
 export const pageChangeLoadingIndicater =  () => {
     useRouter().beforeEach(()=> {
         toggleShowLoading(true)
+        endScrolling(true)
     })
 
     useRouter().afterEach(()=> {
@@ -14,6 +25,7 @@ export const pageChangeLoadingIndicater =  () => {
         nextTick(()=> {
             console.log('stop!!!')
             toggleShowLoading(false)
+            endScrolling(false)
         })
     })
 }
