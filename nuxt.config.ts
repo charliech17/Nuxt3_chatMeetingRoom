@@ -9,8 +9,8 @@ export default defineNuxtConfig({
         ['unplugin-icons/nuxt', { /* options */ }],
         async (options, nuxt) => {
             nuxt.hooks.hook('vite:extendConfig', (config) => {
-              config?.plugins?.push(vuetify());
-           });
+                config?.plugins?.push(vuetify());
+            });
         }
     ],
     css: [
