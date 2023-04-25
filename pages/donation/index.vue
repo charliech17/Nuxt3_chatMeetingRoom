@@ -1,30 +1,39 @@
 <template>
-    <v-btn @click="handleGetAuth">getAuthCode</v-btn> 
     <div>
-        {{ showErrorMsg }}
+        <h1 class="text-center">~~贊助~~</h1>
+        <div class="text-center">
+            <v-btn class="mt-4" @click="jkosPay">街口支付</v-btn> 
+            <v-btn class="mt-4 ml-2" @click="openLinePay">linePay</v-btn> 
+        </div>
+        <section class="mt-4 d-flex justify-center">
+            <div v-if="isShowJkosImg" class="max-w-[50%]">
+                <img src="@/assets/image/donation/jkos.png" alt="">
+            </div>
+            <div v-if="isShowLinePay" class="max-w-[50%]">
+                <img src="@/assets/image/donation/linePay.png" alt="">
+            </div>
+        </section>
     </div>
 </template>
 
 <script setup lang="ts">
-//@ts-ignore
-import jkos from '@jkos/openweb-bridge'
-const showErrorMsg = ref('')
-const handleGetAuth = () => {
-    jkos.getAuthCode({
-        clientId :  '123456' ,
-        scopes : ['phone', 'email', 'barcode'],
-        onSuccess: (authCode: any) => {
-            console.log('authCode',authCode)
-        },
-        onError: (e: any) => {
-            console.log(e.error)
-            console.log(e.errorMessage)
-        },
-        onRejectAuth: () => {}
-        }, (res: any) => {
-            showErrorMsg.value = res.errorMessage
-        console.log(res.error)
-        console.log(res.errorMessage)
-    })
+import { isMobileDevice } from '@/utils/baseUtils'
+
+const isShowJkosImg = ref(false)
+const isShowLinePay = ref(false)
+
+const jkosPay = () => {
+    const jkosAccont = 'https://www.jkopay.com/transfer?j=Transfer:905309698'
+    if(isMobileDevice()) {
+        window.open(jkosAccont)
+    } else {
+        isShowJkosImg.value = !isShowJkosImg.value
+        isShowLinePay.value = false
+    }
+}
+
+const openLinePay = () => {
+    isShowLinePay.value = !isShowLinePay.value
+    isShowJkosImg.value = false
 }
 </script>

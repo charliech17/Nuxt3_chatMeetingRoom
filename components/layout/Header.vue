@@ -121,8 +121,7 @@
                 break
             case 'sponser':
                 isShowDrawer.value = false
-                // TODO 導至贊助頁面
-                alert('敬請期待')
+                navigateTo('/donation')
                 break
         }
     }
