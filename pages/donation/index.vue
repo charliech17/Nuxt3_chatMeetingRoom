@@ -26,10 +26,9 @@ const jkosPay = () => {
     const jkosAccont = 'https://www.jkopay.com/transfer?j=Transfer:905309698'
     if(isMobileDevice()) {
         window.open(jkosAccont)
-    } else {
-        isShowJkosImg.value = !isShowJkosImg.value
-        isShowLinePay.value = false
-    }
+    } 
+    isShowJkosImg.value = !isShowJkosImg.value
+    isShowLinePay.value = false
 }
 
 const openLinePay = () => {
