@@ -17,12 +17,10 @@
                 content-class="bg-white p-4"
                 width="auto"
             >
-                <v-card>
-                    <h2>確定刪除會議?</h2>
-                    <p>若仍有人在會議可能會導致斷訊</p>
-                    <v-btn @click="handleDeleteMeeting">確定刪除</v-btn>
-                    <v-btn @click="isShowAlertDialog = false">關閉彈窗</v-btn>
-                </v-card>
+                <h2>確定刪除會議?</h2>
+                <p>若仍有人在會議可能會導致斷訊</p>
+                <v-btn variant="tonal" color="red" class="mt-2" @click="handleDeleteMeeting">確定刪除</v-btn>
+                <v-btn variant="outlined" color="purple-darken-4" class="text-purple-lighten-3 mt-1" @click="isShowAlertDialog = false">關閉彈窗</v-btn>
             </v-dialog>
         </div>
     </div>
@@ -33,7 +31,7 @@
     import mdiNavigationVariantOutline  from '~icons/mdi/navigation-variant-outline'
     // @ts-ignore
     import QRCode from 'qrcode'
-    import { getRTDBData } from '@/utils/firebase/useRTDB'
+    import { getRTDBData, deleteRTDBData } from '@/utils/firebase/useRTDB'
     import { useAuthStore } from '@/stores/authStore';
     
     const isRoomInfo = ref<null | boolean>(null)
@@ -43,8 +41,13 @@
     
     
     const handleDeleteMeeting = () => {
-        alert('TODO 刪除邏輯 彈窗樣式')
         isShowAlertDialog.value = false
+        if(roomInfo.value?.roomPath) {
+            deleteRTDBData(roomInfo.value.roomPath.replace('_','/'))
+            deleteRTDBData('host/' + useAuthStore().uid)
+            isShowAlertDialog.value = false
+            location.reload()
+        }
     }
 
     const setRoomPath = async () => {
