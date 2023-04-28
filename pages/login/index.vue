@@ -1,5 +1,6 @@
 <template>
-    <div>
+    <div class="inputSectionStyle">
+        <div class="text-center text-lg">登入</div>
         <v-text-field
             v-model="inputEmail"
             :rules="emailRules('login')"
@@ -8,7 +9,7 @@
             color="success"
             clearable
             label="帳號"
-            class="inputField"
+            class="inputField mt-4 mt-md-8"
             @update:model-value="(inputTxt)=> handleAccountInput(inputTxt)"
         ></v-text-field>
         <v-text-field
@@ -75,6 +76,10 @@
 </script>
 
 <style lang="scss" scoped>
+    .inputSectionStyle{
+        max-width: 600px;
+        margin: auto;
+    }
     .inputField {
         :deep(.v-messages__message) {
             color: red;

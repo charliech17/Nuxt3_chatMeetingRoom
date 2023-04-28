@@ -1,8 +1,8 @@
 <template>
-    <div>
-        <div>{{hasDisplayName ? '更新' :'設定' }}個人資料</div>
+    <div class="userInfo_style">
+        <div class="text-lg text-center">{{hasDisplayName ? '更新' :'設定' }}個人資料</div>
         <v-text-field 
-            class="displayNameStyle"
+            class="displayNameStyle mt-4 mt-md-8"
             :rules="[(inputName)=> !inputName.value || '尚未輸入名稱']"
             v-model="newDisplayName"
             label="顯示名稱"
@@ -20,7 +20,7 @@
             counter
             label="File input"
         />
-        <div>
+        <div class="mt-md-8">
             <div>
                 {{hasDisplayName ? '目前的圖片:' : '上傳圖片後顯示在下方框格內'}}
             </div>
@@ -119,6 +119,11 @@ const fileRules = reactive([
 </script>
 
 <style lang="scss" scoped>
+    .userInfo_style {
+        max-width: 600px;
+        margin: auto;
+    }
+
     .displayNameStyle,
     .fileInputStyle{
         :deep(.v-input__prepend){

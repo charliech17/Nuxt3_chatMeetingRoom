@@ -1,42 +1,54 @@
 <template>
-    <div class="cover_sectionStyle">
-        <div class="input-wrapper">
-            <input aria-label="Ask us anything">
-            <span class="placeholder"></span>
-        </div>
-    </div>
-    <section class="text-center mt-8">
-        <div class="flex justify-center align-center gap-2">
-            <v-icon color="#8a2be2" :icon="isAuth ? mdiEmoticonOutline : mdiHelpCircleOutline"></v-icon>
-            <h1 class="text-2xl">{{isAuth ? '開始使用' : '有帳號嗎'}}</h1>
-        </div>
-        <div class="mt-4">
-            <v-btn rounded="lg" class="mr-4" v-if="!isAuth" @click="navigateTo('login')">登入</v-btn>
-            <v-btn rounded="lg" v-if="!isAuth" @click="navigateTo('/login/register')">註冊</v-btn>
-            <v-btn rounded="lg" class="mr-4" v-if="isAuth" @click="navigateTo('/room')">前往我的會議</v-btn>
-            <v-btn rounded="lg" v-if="isAuth" @click="navigateTo('/userInfo')">前往更改設定</v-btn>
-        </div>
-    </section>
-    <section class="mt-4">
-        <div class="font-sans flex align-top justify-between flex-col md:flex-row px-10 md:px-20 md:gap-x-4 intoColorStyle">
-            <div class="mt-8 md:flex-1" v-for="(parameter,index) in topAttractiveParamenters" :key="index">
-                <img
-                    class="block mx-auto"
-                    width="64"
-                    height="64"
-                    :src="parameter.imgPath"
-                />
-                <h2 class="text-center text-2xl mt-2">{{parameter.titleTxt}}</h2>
-                <p class="mt-2">{{ parameter.contentTxt }}</p>
+    <div>
+        <section class="cover_bg">
+            <div class="cover_sectionStyle">
+                <div class="input-wrapper">
+                    <input aria-label="Ask us anything">
+                    <span class="placeholder"></span>
+                </div>
             </div>
-        </div>
-        <v-img
-            src="https://picsum.photos/1920/1081?nature"
-            width="100%"
-            class="bg-grey-lighten-2 mt-4"
-            :lazy-src="`https://picsum.photos/10/6`"
-        ></v-img>
-    </section>
+        </section>
+        <section class="outer_wrapper">
+            <div class="text-center mt-8">
+                <div class="flex justify-center align-center gap-2">
+                    <v-icon color="#8a2be2" :icon="isAuth ? mdiEmoticonOutline : mdiHelpCircleOutline"></v-icon>
+                    <h1 class="text-2xl">{{isAuth ? '開始使用' : '有帳號嗎'}}</h1>
+                </div>
+                <div class="mt-4">
+                    <v-btn rounded="lg" class="mr-4" v-if="!isAuth" @click="navigateTo('login')">登入</v-btn>
+                    <v-btn rounded="lg" v-if="!isAuth" @click="navigateTo('/login/register')">註冊</v-btn>
+                    <v-btn rounded="lg" class="mr-4" v-if="isAuth" @click="navigateTo('/room')">前往我的會議</v-btn>
+                    <v-btn rounded="lg" v-if="isAuth" @click="navigateTo('/userInfo')">前往更改設定</v-btn>
+                </div>
+            </div>
+            <div class="mt-4">
+                <div class="font-sans flex align-top justify-between flex-col md:flex-row px-10 md:px-20 md:gap-x-4 intoColorStyle">
+                    <div class="mt-8 md:flex-1" v-for="(parameter,index) in topAttractiveParamenters" :key="index">
+                        <img
+                            class="block mx-auto"
+                            width="64"
+                            height="64"
+                            :src="parameter.imgPath"
+                        />
+                        <h2 class="text-center text-2xl mt-2">{{parameter.titleTxt}}</h2>
+                        <p class="mt-2">{{ parameter.contentTxt }}</p>
+                    </div>
+                </div>
+                <div class="md:flex gap-2">
+                    <v-img
+                        src="https://picsum.photos/1920/1081?nature1"
+                        class="bg-grey-lighten-2 mt-4"
+                        :lazy-src="`https://picsum.photos/10/6`"
+                    ></v-img>
+                    <v-img
+                        src="https://picsum.photos/1920/1081?nature2"
+                        class="bg-grey-lighten-2 mt-4 d-none d-md-block"
+                        :lazy-src="`https://picsum.photos/10/6`"
+                    ></v-img>
+                </div>
+            </div>
+        </section>
+    </div>
 </template>
 
 
@@ -80,14 +92,29 @@
 <style lang="scss" scoped>
     @import '@/assets/css/typed.scss';
 
+    .cover_bg{
+        background: linear-gradient(#D1C4E9,#EDE7F6,#ccb0fd,#F3E5F5) ;
+        margin: auto -16px;
+    }
 
     .cover_sectionStyle{
         margin: -16px -16px auto -16px;
         width: calc(100vw);
         height: calc( (3223 / 4976) * (100vw) );
+        max-width: calc((4976/3223) * (var(--vh,1vh)*100 - 64px));
+        max-height: calc(var(--vh,1vh)*100 - 64px);
         background-image: url('~/assets/image/index_cover1.jpg');
         background-size: cover;
         background-repeat: no-repeat;
+
+        @media(min-height: 100vh) {
+            margin: -16px auto 0 auto;
+        }
+    }
+
+    .outer_wrapper{
+        max-width: 1200px;
+        margin: 0 auto;
     }
     .input-wrapper {
         display: block;
