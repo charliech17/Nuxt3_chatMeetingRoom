@@ -1,11 +1,10 @@
 <template>
     <div>
         <section class="mainContetSection">
-            <p>{{ 'hello  ' + $route.path }}</p>
-            <p>{{ '是否連接' + isConnect }}</p>
             <div id="insertVideo">
                 <div class="position-relative">
                     <video 
+                        class="w-100"
                         poster="@/assets/image/laughFace.avif"
                         id="myVideo" 
                         ref="myMedia_display"
@@ -146,15 +145,12 @@
     // @ts-ignore
     import { v4 as uuidv4 } from 'uuid';
 
-    // TODO encrypt 會議名稱 & pass
-    // TODO　將function抽出來寫
-    const isConnect = ref(false)
     const roomPathSplit = useRoute().path.split('_')
     const baseRoomURL   = roomPathSplit[0] + "/" + roomPathSplit[1]
     const checkRoomPath = baseRoomURL + '/isRoom'
 
 
-    // @ 檢查是否有該房間
+    // 檢查是否有該房間
     const checkIsRoomValid = async () => {
         const isRoomMeetingValid = await checkIsRTDBData(checkRoomPath)
         // TODO 刪除console
@@ -166,7 +162,7 @@
     }
 
 
-    // @  初始化peer
+    // 初始化peer
     const connectUID: ComputedRef<string | null> = computed(() => useAuthStore().uid) 
     const myMedia_display = ref<HTMLVideoElement|null>(null)
     let myStream: undefined | MediaStream;
@@ -178,11 +174,10 @@
         peerUUID = uuidv4()
         peer = new Peer(peerUUID)
         await initPeerSettings({peer})
-        isConnect.value = true
     }
 
 
-    // @ 連接視訊
+    // 連接視訊
     const connectUserMedia = async () => {
         // 開始視訊
         const constraints: MediaStreamConstraints = {
@@ -190,6 +185,7 @@
             video: { facingMode: "user" },
         }
         const stream = await getUserMedia(constraints)
+        // TODO 處理錯誤邏輯(ex: User不同意視訊...)
         const myVideo = myMedia_display.value as HTMLVideoElement | null
         if(myVideo) {
             myStream = stream
@@ -201,13 +197,8 @@
     }
 
 
-    // @ 監聽peer事件
-    const listenerPeerConnect = () => {
-        listenPeerEvent({peer,localStream:myStream,isConnectAudioRef: isSoundConnect})
-    }
 
-
-    // @ 連接websocket
+    // 連接websocket
     const startWebSocket = () => {
         return new Promise((resolve) => {
             initSocketSetting({
@@ -240,7 +231,7 @@
     }
 
 
-    // @ call function
+    // call other function
     const videoIDList: string[] = []
     const callAllOtherUser = (roomPeerList: string[]) => {
         console.log(roomPeerList,'roomPeerList!!@@##')
@@ -269,7 +260,7 @@
     }
 
 
-    // @ 畫面事件
+    // 畫面事件
     const isSoundConnect = ref(false)
     const videoActiveRef = ref(false)
     const soundActiveRef = ref(false)
@@ -395,7 +386,7 @@
         if(!isRommValid || !isLogin) return navigateTo('/room')
         await startPeer()
         await connectUserMedia()
-        listenerPeerConnect()
+        listenPeerEvent({peer,localStream:myStream,isConnectAudioRef: isSoundConnect})
         await startWebSocket()
         await getDeviceSource()
     }

@@ -1,5 +1,6 @@
 <template>
     <video 
+        class="w-100"
         autoplay
         playsinline
         ref="videoShow"
