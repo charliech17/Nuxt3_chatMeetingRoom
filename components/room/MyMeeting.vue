@@ -8,7 +8,7 @@
                 <img :src="QRCodeURL" class="mt-4 text-center mx-auto" width="164" height="164" alt="">
             </div>
             <div class="mt-4 text-center">
-                <v-btn :prepend-icon="mdiShare" color="purple-darken-4" class="text-purple-lighten-3 mr-4" style="width: 150px;">分享會議連接</v-btn>
+                <v-btn :prepend-icon="mdiShare" color="purple-darken-4" class="text-purple-lighten-3 mr-4" @click="shareLink" style="width: 150px;">分享會議連接</v-btn>
                 <v-btn :prepend-icon="mdiNavigationVariantOutline" @click="navigateTo(roomInfo?.roomPath)" style="width: 150px;">前往會議</v-btn>
             </div>
             <h3 class="text-red text-center text-lg mt-16 rounded-lg">~~ Danger Zone ~~</h3>
@@ -87,6 +87,14 @@
             await generateQR(baseUrl + getRoomInfo.roomPath)
         }
     }
+
+    const shareLink = () => {
+        const shareData = {url: QRCodeURL.value} 
+        if(navigator.share && navigator.canShare(shareData)) {
+            navigator.share(shareData)
+        }
+    }
+
     initMyRoom()
 
 </script>
