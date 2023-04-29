@@ -42,6 +42,9 @@
     const roomInfo = ref<null | {createTime: Date, roomPath: string}>(null)
     const QRCodeURL = ref<string>('')
     const isShowAlertDialog = ref(false)
+    const getUrl = window.location;
+    const baseUrl = getUrl.protocol + "//" + getUrl.host;
+    const meetingUrl = ref('')
     
     
     const handleDeleteMeeting = () => {
@@ -82,14 +85,13 @@
     const initMyRoom = async() => {
         const getRoomInfo = await setRoomPath()
         if(getRoomInfo){
-            const getUrl = window.location;
-            const baseUrl = getUrl.protocol + "//" + getUrl.host;
-            await generateQR(baseUrl + getRoomInfo.roomPath)
+            meetingUrl.value = baseUrl + getRoomInfo.roomPath
+            await generateQR(meetingUrl.value)
         }
     }
 
     const shareLink = () => {
-        const shareData = {url: QRCodeURL.value} 
+        const shareData = {url: meetingUrl.value} 
         if(navigator.share && navigator.canShare(shareData)) {
             navigator.share(shareData)
         }
