@@ -34,7 +34,7 @@
                         <p class="mt-2">{{ parameter.contentTxt }}</p>
                     </div>
                 </div>
-                <div class="md:flex gap-2">
+                <div class="md:flex gap-2 mt-8">
                     <v-img
                         src="https://picsum.photos/1920/1081?nature1"
                         class="bg-grey-lighten-2 mt-4"
@@ -98,7 +98,7 @@
     }
 
     .cover_sectionStyle{
-        margin: -16px -16px auto -16px;
+        margin: -16px auto 0 auto;
         width: calc(100vw);
         height: calc( (3223 / 4976) * (100vw) );
         max-width: calc((4976/3223) * (var(--vh,1vh)*100 - 64px));
@@ -106,10 +106,6 @@
         background-image: url('~/assets/image/index_cover1.jpg');
         background-size: cover;
         background-repeat: no-repeat;
-
-        @media(min-height: 100vh) {
-            margin: -16px auto 0 auto;
-        }
     }
 
     .outer_wrapper{
