@@ -1,7 +1,11 @@
 <template>
     <div>
         <v-layout class="headerSection">
-            <v-app-bar class="position-static" color="primary">
+            <v-app-bar 
+                class="position-static" 
+                :class="use_deviceInfo_Store().systemColorChange ? 'text-white' : ''" 
+                :color="use_deviceInfo_Store().systemColorChange ? '#5f9ea0' : 'primary'"
+            >
                 <template v-slot:prepend>
                     <v-app-bar-nav-icon :icon="headerMdiIcons.mdiMenu" @click="isShowDrawer = !isShowDrawer"></v-app-bar-nav-icon>
                 </template>
@@ -31,6 +35,7 @@
                 temporary
                 :absolute="true"
             >
+                <v-list-item class="py-5 clickEffect" :prepend-icon="headerMdiIcons.mdiBookEducationOutline" title="切換色系" value="education" @click="()=>handleMenuDraweItems('changeColor')"/>
                 <v-list-item class="py-5 clickEffect" :prepend-icon="headerMdiIcons.mdiAccountGroup" title="前往會議資訊" value="room" @click="()=>handleMenuDraweItems('room')"/>
                 <v-list-item class="py-5 clickEffect" :prepend-icon="headerMdiIcons.mdiBookEducationOutline" title="前往使用說明" value="education" @click="()=>handleMenuDraweItems('education')"/>
                 <v-list-item class="py-5 clickEffect" :prepend-icon="headerMdiIcons.mdiCurrencyUsd" title="贊助" value="sponser" @click="()=>handleMenuDraweItems('sponser')"/>
@@ -66,6 +71,7 @@
 
 <script lang="ts" setup>
     import { useAuthStore } from '@/stores/authStore'
+    import { use_deviceInfo_Store } from '@/stores/deviceInfoStore'
     import { signOutUser } from '@/utils/firebase/auth'
     import { headerMdiIcons } from '@/utils/icons/HeaderIconUtils'
     
@@ -81,7 +87,6 @@
         const userImgurl = saveURL ? saveURL : 'https://randomuser.me/api/portraits/women/81.jpg'
         return userImgurl
     })
-
 
     const handleBackHome = () => {
         console.log(useRoute().path,'path')
@@ -108,8 +113,12 @@
     }
 
 
-    const handleMenuDraweItems = async (triggerItems: 'room' | 'education' | 'sponser' ) => {
+    const handleMenuDraweItems = async (triggerItems: 'room' | 'education' | 'sponser' | 'changeColor' ) => {
         switch(triggerItems) {
+            case 'changeColor':
+                use_deviceInfo_Store().changeSystemColor()
+                isShowDrawer.value = false
+                break
             case 'room' :
                 navigateTo('/room')
                 isShowDrawer.value = false
@@ -127,6 +136,28 @@
     }
 
 </script>
+
+<style lang="scss">
+    .lightColor{
+        background: white;
+        color: #6A1B9A;
+        font-weight: 800;
+
+        button{
+            background: rgb(131, 47, 16);
+            color: white;
+            font-weight: 900;
+            &:hover{
+                background-color: antiquewhite;
+                color: black !important;
+            }
+        }
+
+        .cover_bg{
+            background: linear-gradient(#e9d2c4,#EDE7F6,#ceb299,#f5eae5);
+        }
+    }
+</style>
 
 <style lang="scss" scoped>
     .headerSection{

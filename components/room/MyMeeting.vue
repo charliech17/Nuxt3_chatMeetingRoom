@@ -1,10 +1,10 @@
 <template>
     <div>
-        <h1 class="text-left">{{ '*是否有會議? ' + (isRoomInfo ? '是' : '否')  }}</h1>
+        <h1 class="text-left">{{ '🌟 是否有會議? ' + (isRoomInfo ? '是' : '否')  }}</h1>
         <div v-if="isRoomInfo" class="mt-4 text-left">
-            <h2>*創建時間: {{ roomInfo?.createTime }}</h2>
+            <h2>🌟 創建時間: {{ roomInfo?.createTime }}</h2>
             <div class="mt-4">
-                <h2>*會議QR Code:</h2>
+                <h2>🌟 會議QR Code:</h2>
                 <img :src="QRCodeURL" class="mt-4 text-center mx-auto" width="164" height="164" alt="">
             </div>
             <div class="mt-4 text-center">
