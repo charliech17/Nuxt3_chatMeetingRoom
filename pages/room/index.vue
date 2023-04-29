@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <section>
+    <div class="wrapper_style">
+        <section class="text-center">
             <button
                 v-if="isUserLogin"
                 @click="handleMyMeeting"
@@ -20,7 +20,7 @@
                 加入會議室
             </button>
         </section>
-        <section class="mt-4">
+        <section class="mt-4 text-md-center mt-md-8">
             <MyMeeting v-if="isShowMyMeetings"/>
             <RoomMeetingInfoInput :isFrom="'host'" v-if="isShowSetting">
                 <template v-slot:meetingCode>設定會議代碼</template>
@@ -79,4 +79,14 @@
 
     getAuthStatus()
 </script>
+
+<style lang="scss" scoped>
+    .wrapper_style{
+        max-width: 600px;
+        margin: auto;
+        @media (min-width: 768px) {
+
+        }
+    }
+</style>
 

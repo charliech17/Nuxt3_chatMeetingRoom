@@ -1,16 +1,20 @@
 <template>
     <div>
-        <h1>{{ '*是否有會議? ' + (isRoomInfo ? '是' : '否')  }}</h1>
-        <div v-if="isRoomInfo" class="mt-4">
+        <h1 class="text-left">{{ '*是否有會議? ' + (isRoomInfo ? '是' : '否')  }}</h1>
+        <div v-if="isRoomInfo" class="mt-4 text-left">
             <h2>*創建時間: {{ roomInfo?.createTime }}</h2>
             <div class="mt-4">
                 <h2>*會議QR Code:</h2>
                 <img :src="QRCodeURL" class="mt-4 text-center mx-auto" width="164" height="164" alt="">
             </div>
-            <v-btn :prepend-icon="mdiShare" color="purple-darken-4" class="mt-4 text-purple-lighten-3" block>分享會議連接</v-btn>
-            <v-btn :prepend-icon="mdiNavigationVariantOutline" class="mt-4" block @click="navigateTo(roomInfo?.roomPath)">前往會議</v-btn>
-            <h3 class="text-red text-center text-lg mt-8">Danger Zone</h3>
-            <v-btn class="mt-2 text-h6" color="red" block @click="isShowAlertDialog = true">刪除此會議</v-btn>
+            <div class="mt-4 text-center">
+                <v-btn :prepend-icon="mdiShare" color="purple-darken-4" class="text-purple-lighten-3 mr-4" style="width: 150px;">分享會議連接</v-btn>
+                <v-btn :prepend-icon="mdiNavigationVariantOutline" @click="navigateTo(roomInfo?.roomPath)" style="width: 150px;">前往會議</v-btn>
+            </div>
+            <h3 class="text-red text-center text-lg mt-16 rounded-lg">~~ Danger Zone ~~</h3>
+            <div class="mx-auto text-center mt-4">
+                <v-btn class="text-h6 rounded-lg mx-auto" color="red" @click="isShowAlertDialog = true" block min-width="300">刪除此會議</v-btn>
+            </div>
             <v-dialog
                 v-model="isShowAlertDialog"
                 transition="dialog-bottom-transition"
