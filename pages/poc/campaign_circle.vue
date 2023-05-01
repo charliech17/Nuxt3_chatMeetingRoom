@@ -73,7 +73,6 @@ import { VNodeRef } from 'nuxt/dist/app/compat/capi';
         border: 2px solid white;
         position: relative;
         margin: auto;
-        transition: all 2s;
         z-index: 2;
 
         .result_color_circle{
