@@ -20,6 +20,7 @@
         <div class="mt-4">
             <canvas id="backCanvas"></canvas>
         </div>
+        <div>{{ scanTxt }}</div>
     </div>
 </template>
 
@@ -35,6 +36,8 @@
     const startYPoint = 20 + scanFramelength * (32/85)
     const detectLength1 = scanFramelength * (62/85)
     const detectWidth1 = scanFramelength * (4/85)
+
+    const scanTxt = ref('')
     
 
     onMounted(()=> {
@@ -123,7 +126,8 @@
         'eng',
         { logger: m => console.log(m) }
         ).then(({ data: { text } }) => {
-        console.log(text);
+            console.log(text);
+            scanTxt.value = text
         })
     }
 </script>
