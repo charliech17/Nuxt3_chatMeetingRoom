@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { getUserMedia } from "@/utils/baseUtils"
+    import { getUserMedia, isMobileDevice } from "@/utils/baseUtils"
     import Tesseract from 'tesseract.js';
 
     const canvasSize = window.innerWidth - 32
@@ -50,12 +50,11 @@
     })
 
     async function startScan() {
-        const constraints = {
+        const constraints: MediaStreamConstraints = {
             audio: false,
-            video: {
-                facingMode: { exact: "environment" },
-            },
+            video: true,
         }
+        if(isMobileDevice()) constraints.video = {facingMode: { exact: "environment" }}
         const stream = await getUserMedia(constraints)
         const video = document.getElementById('liveStreamInput') as HTMLVideoElement
         if(video) {
@@ -120,7 +119,7 @@
         const backCtx = backCanvas.getContext('2d');
         
         if(!backCtx || !ctx) return
-        const imageData = ctx.getImageData(20,20,scanFramelength,scanFramewidth)//ctx.getImageData(startXPoint + scanFramelength * (9/85) ,startYPoint + scanFramelength * (32/85),detectLength1,detectWidth1)
+        const imageData = ctx.getImageData(startXPoint-10,startYPoint-10,detectLength1+20,detectWidth1+20)//ctx.getImageData(startXPoint + scanFramelength * (9/85) ,startYPoint + scanFramelength * (32/85),detectLength1,detectWidth1)
         backCtx.putImageData(imageData,0,0);
 
         Tesseract.recognize(
