@@ -51,8 +51,10 @@
 
     async function startScan() {
         const constraints = {
-            audio: true,
-            video: true,
+            audio: false,
+            video: {
+                facingMode: { exact: "environment" },
+            },
         }
         const stream = await getUserMedia(constraints)
         const video = document.getElementById('liveStreamInput') as HTMLVideoElement
