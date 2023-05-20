@@ -77,8 +77,8 @@
 
         ctx.drawImage(video, 0, 0, canvasSize, canvasSize);
         ctx.beginPath();
-        ctx.strokeStyle = 'blue'
-        ctx.lineWidth = 3;
+        ctx.strokeStyle = 'white'
+        ctx.lineWidth = 2;
         // ctx.moveTo(0,0);
         // ctx.lineTo(0,canvasSize)
         // ctx.lineTo(canvasSize,canvasSize)
