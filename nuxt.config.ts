@@ -19,6 +19,11 @@ export default defineNuxtConfig({
     build: {
         transpile: ['vuetify'],
     },
+    vite: {
+    define: {
+        "process.env.TESS_ENV": process.env.ENV,
+    },
+    },
     ssr: false,
     runtimeConfig: {},
 })
