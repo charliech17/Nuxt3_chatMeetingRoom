@@ -110,36 +110,7 @@ function doStartEndNoHighlight() {
         })
         surrElement.normalize()
 
-        let parentEl = surrElement.parentElement
-        while(parentEl?.parentElement) {
-            if(parentEl?.classList.contains("edit_text_paragraph")) {
-                break;
-            }
-            parentEl = parentEl.parentElement 
-        }
-        let finalHTML = ''
-        let tempHTML = ''
-        parentEl?.childNodes.forEach((node)=> {
-            const nodeText = node.textContent
-            // @ts-ignore
-            const nodeHTML = node.outerHTML ? node.outerHTML : nodeText
-            if(!nodeText) return
-            // @ts-ignore
-            if(node.classList && node.classList.contains("edit_text_highlight")) {
-                console.log("!!!",node)
-                tempHTML += nodeText
-            } else if(tempHTML) {
-                // @ts-ignore
-                finalHTML += `<span class="edit_text_highlight">${tempHTML}</span>` + `${nodeHTML}`
-                tempHTML = ''
-            } else {
-                // @ts-ignore
-                finalHTML += `${nodeHTML}`
-            }
-        })
-
-        if(!parentEl) return
-        parentEl.innerHTML = finalHTML + (tempHTML ? `<span class="edit_text_highlight">${tempHTML}</span>` : '')
+        removeConcatElement(surrElement)
     }
 }
 
@@ -166,7 +137,6 @@ function doStartOrEndHighlight() {
 
         surrElement.appendChild(range.extractContents())
         range.insertNode(surrElement)
-        console.log(range)
 
         surrElement.childNodes.forEach((node)=> {
             if(node.nodeName === "#text") return
@@ -177,9 +147,41 @@ function doStartOrEndHighlight() {
         })
 
         surrElement.normalize()
-        anchorParentElement?.remove()
-        focusParentElement?.remove()
+        removeConcatElement(surrElement)
     }
+}
+
+function removeConcatElement(surrElement: any) {
+    let parentEl = surrElement.parentElement
+    while(parentEl?.parentElement) {
+        if(parentEl?.classList.contains("edit_text_paragraph")) {
+            break;
+        }
+        parentEl = parentEl.parentElement 
+    }
+    let finalHTML = ''
+    let tempHTML = ''
+    parentEl?.childNodes.forEach((node: any)=> {
+        const nodeText = node.textContent
+        // @ts-ignore
+        const nodeHTML = node.outerHTML ? node.outerHTML : nodeText
+        if(!nodeText) return
+        // @ts-ignore
+        if(node.classList && node.classList.contains("edit_text_highlight")) {
+            console.log("!!!",node)
+            tempHTML += nodeText
+        } else if(tempHTML) {
+            // @ts-ignore
+            finalHTML += `<span class="edit_text_highlight">${tempHTML}</span>` + `${nodeHTML}`
+            tempHTML = ''
+        } else {
+            // @ts-ignore
+            finalHTML += `${nodeHTML}`
+        }
+    })
+
+    if(!parentEl) return
+    parentEl.innerHTML = finalHTML + (tempHTML ? `<span class="edit_text_highlight">${tempHTML}</span>` : '')
 }
 
 function isBackWard() {
