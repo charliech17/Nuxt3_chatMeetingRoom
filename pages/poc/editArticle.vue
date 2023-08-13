@@ -1,20 +1,22 @@
 <template>
-    <div ref="wrapper" class="wrapper" @click="addNewParagraph">
-        <div>
-            <v-btn 
-                @click.stop="highLight" 
-                :prepend-icon="editArticleIcons.mdiSelectColor"
-            >
-                背景顏色
-            </v-btn>
-        </div>
+    <div class="outer-wrapper">
+        <section class="d-flex btn-section">
+            <div>
+                <div>背景色</div>
+                <v-btn
+                    @click="highLight"
+                    :icon="editArticleIcons.mdiSelectColor"
+                />
+            </div>
+        </section>
+        <section ref="paragraphRef" class="text-section" @click="addNewParagraph"></section>
     </div>
 </template>
 
 <script setup lang="ts">
 import {editArticleIcons} from "@/utils/icons/editArticle"
 
-const wrapper = ref<HTMLDivElement | null>(null)
+const paragraphRef = ref<HTMLDivElement | null>(null)
 
 function highLight() {
     // 沒有選取內容
@@ -30,7 +32,7 @@ function highLight() {
 
 function addNewParagraph() {
     const allParagraph = document.getElementsByClassName("edit_text_paragraph")
-    if(!wrapper.value) return
+    if(!paragraphRef.value) return
     if( allParagraph.length > 0 
         && allParagraph[allParagraph.length -1].textContent === '') {
             // @ts-ignore
@@ -43,7 +45,7 @@ function addNewParagraph() {
     newParagraph.contentEditable = "true"
     newParagraph.innerHTML = `你好<span class="edit_text_highlight">哇哇</span>阿阿<span class="edit_text_highlight">我哇</span>哇我很好耶`
     newParagraph.addEventListener("click",(event)=> event.stopPropagation())
-    wrapper.value.appendChild(newParagraph)
+    paragraphRef.value.appendChild(newParagraph)
 }
 
 function judgeRemoveHighlight() {
@@ -202,6 +204,13 @@ function isBackWard() {
 
 
 <style lang="scss">
+    .edit_text_paragraph{
+        line-height: 1.8rem;
+        font-size: 1.2rem;
+    }
+    .text-section > .edit_text_paragraph:nth-child(1) {
+        margin-top: 20px;
+    }
     .edit_text_highlight {
         background-color: rgb(241, 198, 57);
     }
@@ -212,7 +221,10 @@ function isBackWard() {
 </style>
 
 <style lang="scss" scoped>
-    .wrapper{
+    .outer-wrapper{
         height: 100%;
+        .text-section{
+            height: 100%;
+        }
     }
 </style>
