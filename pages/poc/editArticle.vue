@@ -34,11 +34,12 @@ function addNewParagraph() {
     const allParagraph = document.getElementsByClassName("edit_text_paragraph")
     if(!paragraphRef.value) return
     if( allParagraph.length > 0 
-        && allParagraph[allParagraph.length -1].textContent === '') {
-            // @ts-ignore
-            allParagraph[allParagraph.length -1].focus()
-            return
-        }
+        && allParagraph[allParagraph.length -1].textContent === ''
+    ) {
+        const lastParagraph = allParagraph[allParagraph.length -1] as HTMLDivElement
+        lastParagraph.focus()
+        return
+    }
 
     const newParagraph = document.createElement('div')
     newParagraph.classList.add("edit_text_paragraph")
@@ -58,10 +59,9 @@ function judgeRemoveStyle(styleName: string) {
         const grandpa = parentElement.parentElement
         const elementStyles = parentElement.style.cssText
 
-        if(elementStyles.includes(styleName)) {
+        if(elementStyles.includes(styleName) && juggeNode instanceof Text) {
             const startPos = backWard ? focusOffset : anchorOffset 
             const endPos = backWard ?  anchorOffset : focusOffset
-            // @ts-ignore
             const textLength = juggeNode.length
 
             let newHTML = ''
@@ -111,9 +111,11 @@ function doStartEndNoHighlight(styleName: string,styleValue:string) {
         range?.surroundContents(surrElement)
 
         surrElement.childNodes.forEach((node) => {
-            // @ts-ignore
-            if(node.style && node.style.cssText.includes(styleName)) {
-                 // @ts-ignore
+            if(
+                node instanceof HTMLElement 
+                && node.style 
+                && node.style.cssText.includes(styleName)
+            ) {
                 const otherCss = getOtherCssText(node,styleName)
                 const nodeText = otherCss 
                                 ? `<span style="${otherCss}">${node.textContent}</span>`
@@ -141,8 +143,7 @@ function doStartOrEndHighlight(styleName: string,styleValue:string) {
         const finalFoucsOffset = backWard 
                                 ? isFocusContains ? 0 : focusOffset
                                 : isFocusContains ? focusNode?.textContent?.length : focusOffset
-        // @ts-ignore
-        document.getSelection()?.setBaseAndExtent(anchorNode,finalAnchorOffset , focusNode, finalFoucsOffset)
+        document.getSelection()?.setBaseAndExtent(anchorNode!,finalAnchorOffset! , focusNode!, finalFoucsOffset!)
         
         const surrElement = document.createElement("span")
         const range = window.getSelection()?.getRangeAt(0) as Range
@@ -153,9 +154,7 @@ function doStartOrEndHighlight(styleName: string,styleValue:string) {
 
         surrElement.childNodes.forEach((node)=> {
             if(node.nodeName === "#text") return
-            // @ts-ignore
-            if(node.style && node.style.cssText.includes(styleName)) {
-                // @ts-ignore
+            if(node instanceof HTMLElement && node.style && node.style.cssText.includes(styleName)) {
                 const otherCss = getOtherCssText(node,styleName)
                 node.replaceWith(otherCss 
                                 ? `<span style="${otherCss}">${node.textContent}</span>`
@@ -180,10 +179,9 @@ function removeConcatElement(surrElement: any, styleName: string, styleValue: st
     let tempHTML = ''
     parentEl?.childNodes.forEach((node: any)=> {
         const nodeText = node.textContent
-        // @ts-ignore
         const nodeHTML = node.outerHTML ? node.outerHTML : nodeText
         if(!nodeText) return
-        // // @ts-ignore
+
         if( node.style 
             && node.style.cssText.includes(styleName) 
             && node.style.getPropertyValue(styleName) === styleValue
@@ -195,12 +193,10 @@ function removeConcatElement(surrElement: any, styleName: string, styleValue: st
                         : nodeText
             console.log(tempHTML)
         } else if(tempHTML) {
-            // @ts-ignore
             finalHTML += (`<span style="${styleName}:${styleValue};">${tempHTML}</span>` 
                             + `${nodeHTML}`)
             tempHTML = ''
         } else {
-            // @ts-ignore
             finalHTML += `${nodeHTML}`
         }
     })
