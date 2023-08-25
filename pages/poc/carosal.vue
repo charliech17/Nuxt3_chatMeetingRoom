@@ -37,7 +37,7 @@
     const nowPickList = reactive<string[]>([])
     const baseAssetsPath = import.meta.env.VITE_ENVIROMENT === "DEV"
                             ? "/_nuxt/assets/image/testImage/"
-                            : "@/assets/image/testImage/"
+                            : "/assets/image/testImage/"
     setPicList()
     
 
