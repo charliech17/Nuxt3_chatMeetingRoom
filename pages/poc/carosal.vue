@@ -35,7 +35,9 @@
     const isAutoPicture = ref(true)
     const allPicList = ["1","2","3","4","5"]
     const nowPickList = reactive<string[]>([])
-    const baseAssetsPath = "/_nuxt/assets/image/testImage/"
+    const baseAssetsPath = import.meta.env.VITE_ENVIROMENT === "DEV"
+                            ? "/_nuxt/assets/image/testImage/"
+                            : "@/assets/image/testImage/"
     setPicList()
     
 
