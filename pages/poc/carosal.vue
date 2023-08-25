@@ -5,11 +5,11 @@
             class="img_container" 
             @transitionend="handleLoop" 
         >
-            <img src="@/assets/image/testImage/1.jpg" alt="">
+            <!-- <img src="@/assets/image/testImage/1.jpg" alt="">
             <img src="@/assets/image/testImage/2.jpg" alt="">
             <img src="@/assets/image/testImage/3.jpg" alt="">
             <img src="@/assets/image/testImage/4.jpg" alt="">
-            <img src="@/assets/image/testImage/5.jpg" alt="">
+            <img src="@/assets/image/testImage/5.jpg" alt=""> -->
         </div>
         <div 
             v-else
@@ -20,6 +20,10 @@
         </div>
         <v-btn @click="startAutoPic">自動滑動相片</v-btn>
         <v-btn @click="startMovePic">手動滑動相片</v-btn>
+        <div class="m-4">
+            <v-btn @click="openKeyboard">按我</v-btn>
+            <input id="inputID" type="text" style="border:1px solid blue;">
+        </div>
     </div>
 </template>
 
@@ -28,7 +32,29 @@
     let img: undefined | HTMLImageElement;
     let imgContainer: undefined | HTMLDivElement
     let nowTransition = 100
-    const isAutoPicture = ref(false)
+    const isAutoPicture = ref(true)
+    const allPicList = ["1","2","3","4","5"]
+    const nowPickList = reactive<string[]>([])
+    const baseAssetsPath = "/_nuxt/assets/image/testImage/"
+    setPicList()
+    
+
+    function setPicList() {
+        const lastItem = allPicList[allPicList.length - 1]
+        const firstItem = allPicList[0]
+        const secondItem = allPicList[1]
+        nowPickList.push(lastItem,firstItem,secondItem)
+        nextTick(()=> {
+            imgContainer = document.querySelector(".img_container")! as HTMLDivElement
+            nowPickList.forEach((item) => {
+                const img = document.createElement("img")
+                img.src = new URL(baseAssetsPath + item + ".jpg", import.meta.url).href
+                img.style.width = "100vw"
+                img.style.flexShrink = "0"
+                imgContainer!.appendChild(img)
+            })
+        })
+    }
 
     function startAutoPic() {
         isAutoPicture.value = true
@@ -71,6 +97,10 @@
                 ts = te
             })
         })
+    }
+
+    function openKeyboard() {
+        document.getElementById("inputID")?.focus()
     }
 </script>
 
