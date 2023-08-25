@@ -5,18 +5,20 @@
             class="img_container" 
             @transitionend="handleLoop" 
         >
-            <!-- <img src="@/assets/image/testImage/1.jpg" alt="">
-            <img src="@/assets/image/testImage/2.jpg" alt="">
-            <img src="@/assets/image/testImage/3.jpg" alt="">
-            <img src="@/assets/image/testImage/4.jpg" alt="">
-            <img src="@/assets/image/testImage/5.jpg" alt=""> -->
+            <img 
+                v-for="(imageName,index) in nowPickList" 
+                :id="'image_'+ index"
+                :key="imageName.name"
+                :src="imageName.url" 
+                alt=""
+            >
         </div>
         <div 
             v-else
             class="mt-2 container_scale" 
         >
-            <img src="@/assets/image/testImage/1.jpg" alt="">
-            <img src="@/assets/image/testImage/2.jpg" alt="">
+            <img src="/testImage/1.jpg" alt="">
+            <img src="/testImage/2.jpg" alt="">
         </div>
         <v-btn @click="startAutoPic">自動滑動相片</v-btn>
         <v-btn @click="startMovePic">手動滑動相片</v-btn>
@@ -28,16 +30,18 @@
 </template>
 
 <script lang="ts" setup>
-
+    interface nowPickListType {
+        name: string
+        url: any
+    }
     let img: undefined | HTMLImageElement;
     let imgContainer: undefined | HTMLDivElement
-    let nowTransition = 100
+    let nowTransition = 200
+    let orignTransition = 100
     const isAutoPicture = ref(true)
     const allPicList = ["1","2","3","4","5"]
-    const nowPickList = reactive<string[]>([])
-    const baseAssetsPath = import.meta.env.VITE_ENVIROMENT === "DEV"
-                            ? "/_nuxt/assets/image/testImage/"
-                            : "/assets/image/testImage/"
+    const nowPickList = reactive<nowPickListType[]>([])
+    const baseAssetsPath = "/testImage/"
     setPicList()
     
 
@@ -45,15 +49,15 @@
         const lastItem = allPicList[allPicList.length - 1]
         const firstItem = allPicList[0]
         const secondItem = allPicList[1]
-        nowPickList.push(lastItem,firstItem,secondItem)
+        const imageOrder = [lastItem,firstItem,secondItem]
+        
         nextTick(()=> {
             imgContainer = document.querySelector(".img_container")! as HTMLDivElement
-            nowPickList.forEach((item) => {
-                const img = document.createElement("img")
-                img.src = new URL(baseAssetsPath + item + ".jpg", import.meta.url).href
-                img.style.width = "100vw"
-                img.style.flexShrink = "0"
-                imgContainer!.appendChild(img)
+            imageOrder.forEach((item) => {
+                nowPickList.push({
+                    name: item,
+                    url:  new URL(baseAssetsPath + item + ".jpg", import.meta.url).href,
+                })
             })
         })
     }
@@ -67,15 +71,27 @@
 
     function transformStart() {
         imgContainer = document.querySelector(".img_container")! as HTMLDivElement
-        img = document.querySelector("img") as HTMLImageElement
+        img = document.getElementById('image_1') as HTMLImageElement
         imgContainer!.style.transition = `transform 1.5s`
         imgContainer.style.transform = `translateX(-${nowTransition}vw)`
     }
 
     function handleLoop() {
-        img?.remove()
         imgContainer!.style.transition = ``
-        imgContainer!.style.transform = ``
+        
+        nowPickList.shift()
+        const newData = Number(nowPickList[1].name) + 1
+        const finalData = newData > 5 ? 1 : newData
+        
+        nowPickList.push({
+            name: finalData.toString(),
+            url:  new URL(baseAssetsPath + finalData.toString() + ".jpg", import.meta.url).href,
+        })
+
+        nextTick(()=> {
+            imgContainer!.style.transform = `translateX(-${orignTransition}vw)`
+        })
+
         setTimeout(()=>{
             transformStart()
         },1000)
@@ -114,6 +130,7 @@
         margin: -16px;
         .img_container{
             display: flex;
+            transform: translateX(-100vw);
         }
         .img_container > img{
             flex-shrink: 0;
