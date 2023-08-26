@@ -47,6 +47,7 @@
     const isAutoPicture = ref(false)
     const nowPickList = ref<nowPickListType[]>([])
     init(nowPickList)
+    startMovePic()
 
 
     function startAutoPic() {
@@ -68,6 +69,7 @@
                 ts = event.touches[0].clientX
             })
             addEventListener("touchmove",(event)=> {
+                console.log('startMovePic')
                 te = event.touches[0].clientX
                 container!.style.transform = `translateX(${lastPoint + (te-ts)}px)`
                 lastPoint += (te-ts)
