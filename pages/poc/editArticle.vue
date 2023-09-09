@@ -19,13 +19,29 @@
 <script setup lang="ts">
 import {editArticleIcons} from "@/utils/icons/editArticle"
 
+interface controlParm {
+    allElHeightRange: number[],
+    allElLength: number,
+    nowElementIndex: null | number,
+    afterElMoveIndex: null | number,
+}
+
 const paragraphRef = ref<HTMLDivElement | null>(null)
-const isEdit = ref(false)
-const isholdImg = ref(false)
-let allElHeightRange: number[] = []
-const img_highlight_class = "img_move_hightlight"
-const img_top_highlight_class = "img_move_top_hightlight"
-let imgPlaceIndex: null|number = null
+const {isEdit,isholdingEL} = {
+    isEdit: ref(false),
+    isholdingEL: ref(false)
+}
+const {img_highlight_class,img_top_highlight_class,text_edit_paragraph_class} = {
+    img_highlight_class: "img_move_hightlight",
+    img_top_highlight_class: "img_move_top_hightlight",
+    text_edit_paragraph_class: "edit_text_paragraph"
+}
+let {allElHeightRange,nowElementIndex, afterElMoveIndex, allElLength}: controlParm = {
+    allElHeightRange: [],
+    allElLength: 0,
+    nowElementIndex: null, // 目前元素在段落中排在第幾個位置(pointerdown才觸發，pointerup刪除),
+    afterElMoveIndex: null,
+}
 
 function addStyle(styleName: string, styleValue: string) {
     // 沒有選取內容
@@ -40,9 +56,9 @@ function addStyle(styleName: string, styleValue: string) {
 }
 
 function addNewParagraph() {
-    const allParagraph = document.getElementsByClassName("edit_text_paragraph")
+    const allParagraph = document.getElementsByClassName(text_edit_paragraph_class)
     if(!paragraphRef.value) return
-    if(isEdit.value || isholdImg.value) return
+    if(isEdit.value || isholdingEL.value) return
     if( allParagraph.length > 0 
         && allParagraph[allParagraph.length -1].textContent === ''
     ) {
@@ -51,15 +67,7 @@ function addNewParagraph() {
         return
     }
 
-    const newParagraph = document.createElement('div')
-    newParagraph.classList.add("edit_text_paragraph")
-    newParagraph.contentEditable = "true"
-    newParagraph.innerHTML = `你好<span style="background-color:blue;margin:4px">哇哇</span>阿阿<span style="background-color: rgb(241, 198, 57);">我哇</span>哇我很好耶`
-    newParagraph.addEventListener("click",(event)=> event.stopPropagation())
-    newParagraph.addEventListener("focus",(event)=> isEdit.value = true)
-    newParagraph.addEventListener("blur",(event)=>  setTimeout(()=> isEdit.value = false,200))
-    paragraphRef.value.appendChild(newParagraph)
-    newParagraph.focus()
+    createParagraphChild("edit_text")
 }
 
 function judgeRemoveStyle(styleName: string) {
@@ -183,7 +191,7 @@ function doStartOrEndHighlight(styleName: string,styleValue:string) {
 function removeConcatElement(surrElement: any, styleName: string, styleValue: string) {
     let parentEl = surrElement.parentElement
     while(parentEl?.parentElement) {
-        if(parentEl?.classList.contains("edit_text_paragraph")) {
+        if(parentEl?.classList.contains(text_edit_paragraph_class)) {
             break;
         }
         parentEl = parentEl.parentElement 
@@ -249,7 +257,7 @@ document.onpaste = function (event) {
                     document.activeElement?.querySelector('img')?.remove()
                     if(!(document.activeElement instanceof HTMLElement)) return
                     document.activeElement?.blur()
-                    createImgElement(event.target.result! as string)
+                    createParagraphChild("img_part",event.target.result! as string)
                 }
             }; 
             reader.readAsDataURL(blob!);
@@ -264,33 +272,27 @@ function getComputedStyle(el: HTMLElement,styKey: string) {
     return computedValue
 }
 
-function createImgElement(imgSRC: string) {
-    const wrapperDiv = document.createElement('div')
-    const innerImg = document.createElement('img')
-    innerImg.src = imgSRC
-    wrapperDiv.style.display = 'flex'
-    wrapperDiv.style.justifyContent = 'center'
-    wrapperDiv.style.width = '100%'
-    innerImg.draggable = false
-    wrapperDiv.id = new Date().toISOString()
-    wrapperDiv.addEventListener("pointerdown",(event)=> {
+function addMoveBlockEvt(el: HTMLElement) {
+    el.addEventListener("pointerdown",()=> {
         allElHeightRange = []
-        isholdImg.value = true
+        isholdingEL.value = true
         const allElement = paragraphRef.value!.children
+        allElLength = allElement.length
         const pageScroll = document.getElementById("mainContent_scrollSection_ID")!.scrollTop
         for(let i=0;i<allElement!.length;i++){
-            const element = allElement[i] as HTMLElement
-            const elHeight = pageScroll + element.getBoundingClientRect().top
+            const eachEl = allElement[i] as HTMLElement
+            const elHeight = pageScroll + eachEl.getBoundingClientRect().top
             allElHeightRange.push(elHeight)
-            if(element.id && wrapperDiv.id === element.id) {
-                imgPlaceIndex = i
+            if(eachEl.id && el.id === eachEl.id) {
+                nowElementIndex = i
             }
         }
         window.addEventListener('pointermove',handlePointerMove)
         window.addEventListener("pointerup",handlePointerUp)
     })
+
     function handlePointerMove(event: PointerEvent) {
-        if(isholdImg.value) {
+        if(isholdingEL.value) {
             const allElement = paragraphRef.value!.children
             const pageScroll = document.getElementById("mainContent_scrollSection_ID")!.scrollTop
             const mousePosition = pageScroll + event.pageY
@@ -306,13 +308,15 @@ function createImgElement(imgSRC: string) {
                 }
             }
             // 設定新的highlight
+            afterElMoveIndex = null
             for(let index=0;index<allElHeightRange.length;index++) {
                 // 移動到最前對落，且原本位置不在最前段落
                 if( 
                     index === 0
-                    && index !== imgPlaceIndex
+                    && index !== nowElementIndex
                     && mousePosition < allElHeightRange[index]
                 ) {
+                    afterElMoveIndex = 0
                     allElement[index]?.classList.add(img_top_highlight_class)
                     return
                 }
@@ -321,21 +325,23 @@ function createImgElement(imgSRC: string) {
                     allElHeightRange[index+1] 
                     && mousePosition > allElHeightRange[index]
                     && mousePosition < allElHeightRange[index+1]
-                    && (index+1) !== imgPlaceIndex
-                    && index !== imgPlaceIndex
+                    && (index+1) !== nowElementIndex
+                    && index !== nowElementIndex
                 ) {
                     console.log('now index',index)
                     allElement[index]?.classList.add(img_highlight_class)
+                    afterElMoveIndex = index + 1
                     return
                 }
                 // 移動到最後段落，且原來位置不在最後段落
                 if(
                     index === allElHeightRange.length -1 
-                    && index !== imgPlaceIndex
+                    && index !== nowElementIndex
                     && mousePosition > allElHeightRange[index-1]
                     && mousePosition > (allElement[index].getBoundingClientRect().bottom + pageScroll)
                 ) {
                     allElement[index]?.classList.add(img_highlight_class)
+                    afterElMoveIndex = index + 1
                     return
                 }
             }
@@ -343,17 +349,69 @@ function createImgElement(imgSRC: string) {
     }
 
     function handlePointerUp() {
+        if(afterElMoveIndex) {
+            // TODO 最後index parentNode.appendChild()
+            if(afterElMoveIndex === allElLength) {
+                
+            } 
+            // TODO 其它index (parentNode.insertBefore(newNode,prevNode))
+            else {
+
+            }
+
+            afterElMoveIndex = null
+        }
+        nowElementIndex = null
         setTimeout(()=>{
-            isholdImg.value = false
+            isholdingEL.value = false
             console.log('trigger up')
         },200)
         window.removeEventListener("pointermove",handlePointerMove)
         window.removeEventListener("pointerup",handlePointerUp)
     }
+}
+
+type cpChildType = "edit_text" | "img_part"
+function createParagraphChild(elType: cpChildType,imgSRC:string|null=null) {
+    switch(elType) {
+        case "edit_text":
+            createEditText()
+            break;
+        case "img_part":
+            createImgPart(imgSRC!)
+            break;
+    }
+}
+
+function createEditText() {
+    const newParagraph = document.createElement('div')
+    newParagraph.classList.add(text_edit_paragraph_class)
+    newParagraph.contentEditable = "true"
+    newParagraph.innerHTML = `你好<span style="background-color:blue;margin:4px">哇哇</span>阿阿<span style="background-color: rgb(241, 198, 57);">我哇</span>哇我很好耶`
+    newParagraph.addEventListener("click",(event)=> event.stopPropagation())
+    newParagraph.addEventListener("focus",()=> isEdit.value = true)
+    newParagraph.addEventListener("blur",()=>  setTimeout(()=> isEdit.value = false,200))
+    newParagraph.id = new Date().toISOString()
+    addMoveBlockEvt(newParagraph)
+    paragraphRef.value!.appendChild(newParagraph)
+    newParagraph.focus()
+}
+
+function createImgPart(imgSRC: string) {
+    const wrapperDiv = document.createElement('div')
+    const innerImg = document.createElement('img')
+    innerImg.src = imgSRC
+    wrapperDiv.style.display = 'flex'
+    wrapperDiv.style.justifyContent = 'center'
+    wrapperDiv.style.width = '100%'
+    innerImg.draggable = false
+    wrapperDiv.id = new Date().toISOString()
+    addMoveBlockEvt(wrapperDiv)
 
     wrapperDiv.appendChild(innerImg)
     paragraphRef.value!.appendChild(wrapperDiv)
 }
+
 
 function init() {
     nextTick(()=>{
