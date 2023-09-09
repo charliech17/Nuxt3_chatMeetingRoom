@@ -1,15 +1,18 @@
 <template>
     <div class="outer-wrapper">
-        <section class="d-flex btn-section">
-            <div>
-                <div>背景色</div>
-                <v-btn
-                    @click="() => addStyle('background-color','rgb(241, 198, 57)')"
-                    :icon="editArticleIcons.mdiSelectColor"
-                />
-            </div>
-        </section>
-        <section ref="paragraphRef" class="text-section" @click="addNewParagraph"></section>
+        <div class="inner-wrapper">
+            <section class="d-flex btn-section" id="btn-section">
+                <div>
+                    <div>背景色</div>
+                    <v-btn
+                        @click="() => addStyle('background-color','rgb(241, 198, 57)')"
+                        :icon="editArticleIcons.mdiSelectColor"
+                    />
+                </div>
+            </section>
+            <section ref="paragraphRef" class="text-section" @click="addNewParagraph"></section>
+        </div>
+        <section id="bottom_empty_section" style="height: 32px;" @click="addNewParagraph"></section>
     </div>
 </template>
 
@@ -17,6 +20,12 @@
 import {editArticleIcons} from "@/utils/icons/editArticle"
 
 const paragraphRef = ref<HTMLDivElement | null>(null)
+const isEdit = ref(false)
+const isholdImg = ref(false)
+let allElHeightRange: number[] = []
+const img_highlight_class = "img_move_hightlight"
+const img_top_highlight_class = "img_move_top_hightlight"
+let imgPlaceIndex: null|number = null
 
 function addStyle(styleName: string, styleValue: string) {
     // 沒有選取內容
@@ -33,6 +42,7 @@ function addStyle(styleName: string, styleValue: string) {
 function addNewParagraph() {
     const allParagraph = document.getElementsByClassName("edit_text_paragraph")
     if(!paragraphRef.value) return
+    if(isEdit.value || isholdImg.value) return
     if( allParagraph.length > 0 
         && allParagraph[allParagraph.length -1].textContent === ''
     ) {
@@ -46,7 +56,10 @@ function addNewParagraph() {
     newParagraph.contentEditable = "true"
     newParagraph.innerHTML = `你好<span style="background-color:blue;margin:4px">哇哇</span>阿阿<span style="background-color: rgb(241, 198, 57);">我哇</span>哇我很好耶`
     newParagraph.addEventListener("click",(event)=> event.stopPropagation())
+    newParagraph.addEventListener("focus",(event)=> isEdit.value = true)
+    newParagraph.addEventListener("blur",(event)=>  setTimeout(()=> isEdit.value = false,200))
     paragraphRef.value.appendChild(newParagraph)
+    newParagraph.focus()
 }
 
 function judgeRemoveStyle(styleName: string) {
@@ -224,6 +237,138 @@ function getOtherCssText(node: HTMLElement,styleName:string) {
     return node.style.cssText
 }
 
+document.onpaste = function (event) {
+    const items = (event.clipboardData!).items;
+    for (const index in items) {
+        const item = items[index];
+        if (item.kind === 'file' && item.type.includes("image/")) {
+            var blob = item.getAsFile();
+            var reader = new FileReader();
+            reader.onload = function (event) {
+                if(event.target) {
+                    document.activeElement?.querySelector('img')?.remove()
+                    if(!(document.activeElement instanceof HTMLElement)) return
+                    document.activeElement?.blur()
+                    createImgElement(event.target.result! as string)
+                }
+            }; 
+            reader.readAsDataURL(blob!);
+        }
+    }
+};
+
+function getComputedStyle(el: HTMLElement,styKey: string) {
+    const computedValue = window.getComputedStyle(el,null)
+            .getPropertyValue(styKey)
+            .replace("px","")
+    return computedValue
+}
+
+function createImgElement(imgSRC: string) {
+    const wrapperDiv = document.createElement('div')
+    const innerImg = document.createElement('img')
+    innerImg.src = imgSRC
+    wrapperDiv.style.display = 'flex'
+    wrapperDiv.style.justifyContent = 'center'
+    wrapperDiv.style.width = '100%'
+    innerImg.draggable = false
+    wrapperDiv.id = new Date().toISOString()
+    wrapperDiv.addEventListener("pointerdown",(event)=> {
+        allElHeightRange = []
+        isholdImg.value = true
+        const allElement = paragraphRef.value!.children
+        const pageScroll = document.getElementById("mainContent_scrollSection_ID")!.scrollTop
+        for(let i=0;i<allElement!.length;i++){
+            const element = allElement[i] as HTMLElement
+            const elHeight = pageScroll + element.getBoundingClientRect().top
+            allElHeightRange.push(elHeight)
+            if(element.id && wrapperDiv.id === element.id) {
+                imgPlaceIndex = i
+            }
+        }
+        window.addEventListener('pointermove',handlePointerMove)
+        window.addEventListener("pointerup",handlePointerUp)
+    })
+    function handlePointerMove(event: PointerEvent) {
+        if(isholdImg.value) {
+            const allElement = paragraphRef.value!.children
+            const pageScroll = document.getElementById("mainContent_scrollSection_ID")!.scrollTop
+            const mousePosition = pageScroll + event.pageY
+            // 移除先前所有highlight
+            if(allElement[0]?.classList.contains(img_top_highlight_class)) {
+                allElement[0]?.classList.remove(img_top_highlight_class)
+            }
+            for(let index=0;index<allElHeightRange.length;index++) {
+                if( 
+                    allElement[index]?.classList.contains(img_highlight_class)
+                ){
+                    allElement[index].classList.remove(img_highlight_class)
+                }
+            }
+            // 設定新的highlight
+            for(let index=0;index<allElHeightRange.length;index++) {
+                // 移動到最前對落，且原本位置不在最前段落
+                if( 
+                    index === 0
+                    && index !== imgPlaceIndex
+                    && mousePosition < allElHeightRange[index]
+                ) {
+                    allElement[index]?.classList.add(img_top_highlight_class)
+                    return
+                }
+                // 移動到兩個段落之間，且不等於原本位置
+                if( 
+                    allElHeightRange[index+1] 
+                    && mousePosition > allElHeightRange[index]
+                    && mousePosition < allElHeightRange[index+1]
+                    && (index+1) !== imgPlaceIndex
+                    && index !== imgPlaceIndex
+                ) {
+                    console.log('now index',index)
+                    allElement[index]?.classList.add(img_highlight_class)
+                    return
+                }
+                // 移動到最後段落，且原來位置不在最後段落
+                if(
+                    index === allElHeightRange.length -1 
+                    && index !== imgPlaceIndex
+                    && mousePosition > allElHeightRange[index-1]
+                    && mousePosition > (allElement[index].getBoundingClientRect().bottom + pageScroll)
+                ) {
+                    allElement[index]?.classList.add(img_highlight_class)
+                    return
+                }
+            }
+        }
+    }
+
+    function handlePointerUp() {
+        setTimeout(()=>{
+            isholdImg.value = false
+            console.log('trigger up')
+        },200)
+        window.removeEventListener("pointermove",handlePointerMove)
+        window.removeEventListener("pointerup",handlePointerUp)
+    }
+
+    wrapperDiv.appendChild(innerImg)
+    paragraphRef.value!.appendChild(wrapperDiv)
+}
+
+function init() {
+    nextTick(()=>{
+        const btnSection = document.getElementById('btn-section') as HTMLElement
+        const bottomEptSection = document.getElementById('bottom_empty_section') as HTMLElement
+        const btnSectionHeight = getComputedStyle(btnSection,'height')
+        const bottomEptHeight = getComputedStyle(bottomEptSection,'height')
+        console.log(bottomEptHeight)
+        paragraphRef.value!.style.setProperty('--btn_section_height',`${btnSectionHeight}px`)
+        paragraphRef.value!.style.setProperty('--bottom_ept_section',`${bottomEptHeight}px`)
+    })
+}
+
+init()
+
 </script>
 
 
@@ -239,6 +384,14 @@ function getOtherCssText(node: HTMLElement,styleName:string) {
         background-color: rgb(241, 198, 57);
     }
 
+    .img_move_hightlight {
+        border-bottom: 5px solid #1effd5;
+    }
+    
+    .img_move_top_hightlight {
+        border-top: 5px solid #1effd5;
+    }
+
     h2{
         font-size: 36px;
     }
@@ -246,9 +399,10 @@ function getOtherCssText(node: HTMLElement,styleName:string) {
 
 <style lang="scss" scoped>
     .outer-wrapper{
-        height: 100%;
-        .text-section{
-            height: 100%;
+        .inner-wrapper{
+            .text-section{
+                min-height: calc( var(--vh,1vh)*100 - var(--headerHeight) - var(--btn_section_height) - 32px - var(--bottom_ept_section));
+            }
         }
     }
 </style>
