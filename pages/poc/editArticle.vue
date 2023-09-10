@@ -293,7 +293,7 @@ function addMoveBlockEvt(el: HTMLElement) {
             const allElement = paragraphRef.value!.children
             allElLength = allElement.length
             const pageScroll = document.getElementById("mainContent_scrollSection_ID")!.scrollTop
-            document.getElementById("mainContent_scrollSection_ID")!.style.touchAction = 'none'
+            disableScroll(true)
             for(let i=0;i<allElement!.length;i++){
                 const eachEl = allElement[i] as HTMLElement
                 const elHeight = pageScroll + eachEl.getBoundingClientRect().top
@@ -367,7 +367,6 @@ function addMoveBlockEvt(el: HTMLElement) {
         console.log('tiggerup')
         if(!isholdingEL.value) {
             clearTimeout(timer)
-            document.getElementById("mainContent_scrollSection_ID")!.style.touchAction = ''
         }
         // 移動元素
         const allElement = paragraphRef.value!.children
@@ -376,21 +375,19 @@ function addMoveBlockEvt(el: HTMLElement) {
             const elType = bmEl.dataset.tagPurpose as cpChildType
             const bmElInnerHtml = bmEl.innerHTML
             const cloneEl = createParagraphChild(elType,bmElInnerHtml,false)
-            // TODO 最後index parentNode.appendChild()
             if(afterElMoveIndex === allElLength) {
                 paragraphRef.value?.appendChild(cloneEl)
                 bmEl.remove()
-            } 
-            // TODO 其它index (parentNode.insertBefore(newNode,prevNode))
-            else {
+            } else {
                 const prevEl = allElement[afterElMoveIndex]
                 paragraphRef.value?.insertBefore(cloneEl,prevEl)
                 bmEl.remove()
             }
-
             afterElMoveIndex = null
         }
         nowElementIndex = null
+        // 讓畫面可以滑動
+        disableScroll(false)
         // 清除所有highlight
         removeAllHighlight(allElement)
         // 清除holdingEl
