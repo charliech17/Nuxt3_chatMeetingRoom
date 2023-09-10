@@ -301,17 +301,24 @@ function addMoveBlockEvt(el: HTMLElement) {
                     nowElementIndex = i
                 }
             }
-            window.addEventListener('pointermove',handlePointerMove)
-            window.addEventListener("pointerup",handlePointerUp)
+
+            const isMobile = isMobileDevice()
+            if(isMobile) {
+                window.addEventListener("touchmove",handlePointerMove)
+                window.addEventListener("touchend",handlePointerUp)
+            } else {
+                window.addEventListener('mousemove',handlePointerMove)
+                window.addEventListener("mouseup",handlePointerUp)
+            }
         },1000)
     })
 
-    function handlePointerMove(event: PointerEvent) {
+    function handlePointerMove(event: MouseEvent | TouchEvent) {
         if(isholdingEL.value) {
             event.stopPropagation()
             const allElement = paragraphRef.value!.children
             const pageScroll = document.getElementById("mainContent_scrollSection_ID")!.scrollTop
-            const mousePosition = pageScroll + event.pageY
+            let mousePosition = pageScroll + (event instanceof MouseEvent ? event.pageY : event.touches[0].pageY)
             // 移除先前所有highlight
             removeAllHighlight(allElement)
             // 設定新的highlight
@@ -389,8 +396,10 @@ function addMoveBlockEvt(el: HTMLElement) {
             isholdingEL.value = false
         },200)
         // 清除移動事件
-        window.removeEventListener("pointermove",handlePointerMove)
-        window.removeEventListener("pointerup",handlePointerUp)
+        window.removeEventListener("mousemove",handlePointerMove)
+        window.removeEventListener("mouseup",handlePointerUp)
+        window.removeEventListener("touchmove",handlePointerMove)
+        window.removeEventListener("touchend",handlePointerUp)
     }
 }
 
@@ -495,7 +504,6 @@ function removeAllHighlight(allElement: HTMLCollection) {
     }
 }
 
-
 function init() {
     nextTick(()=>{
         const btnSection = document.getElementById('btn-section') as HTMLElement
@@ -545,7 +553,7 @@ init()
     .outer-wrapper{
         .inner-wrapper{
             .text-section{
-                min-height: calc( var(--vh,1vh)*100 - var(--headerHeight) - var(--btn_section_height) - 32px - var(--bottom_ept_section));
+                min-height: calc( var(--vh,1vh)*100 - var(--headerHeight) - var(--btn_section_height) - 32px - 16px - var(--bottom_ept_section));
             }
         }
     }
