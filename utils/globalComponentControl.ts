@@ -17,10 +17,10 @@ const endScrolling = (isStart: boolean) => {
 export const disableScroll = (isDisable: boolean) => {
     const scrollSection = document.getElementById('mainContent_scrollSection_ID')
     if(isDisable && scrollSection) {
-        scrollSection.style.touchAction = 'none'
+        scrollSection.style.overflow = 'hidden'
     }
     else if(!isDisable &&  scrollSection) {
-        scrollSection.style.touchAction = ''
+        scrollSection.style.overflow = ''
     }
 }
 
