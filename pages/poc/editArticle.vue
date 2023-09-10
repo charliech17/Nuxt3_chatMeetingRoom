@@ -31,10 +31,15 @@ const {isEdit,isholdingEL} = {
     isEdit: ref(false),
     isholdingEL: ref(false)
 }
-const {img_highlight_class,img_top_highlight_class,text_edit_paragraph_class} = {
+const {
+    img_highlight_class,img_top_highlight_class,text_edit_paragraph_class,
+    edit_text,img_part
+} = {
     img_highlight_class: "img_move_hightlight",
     img_top_highlight_class: "img_move_top_hightlight",
-    text_edit_paragraph_class: "edit_text_paragraph"
+    text_edit_paragraph_class: "edit_text_paragraph",
+    img_part: "img_part",
+    edit_text: "edit_text"
 }
 let {allElHeightRange,nowElementIndex, afterElMoveIndex, allElLength}: controlParm = {
     allElHeightRange: [],
@@ -67,7 +72,8 @@ function addNewParagraph() {
         return
     }
 
-    createParagraphChild("edit_text")
+    const initInnerHTML = `你好<span style="background-color:blue;margin:4px">哇哇</span>阿阿<span style="background-color: rgb(241, 198, 57);">我哇</span>哇我很好耶`
+    createParagraphChild("edit_text",initInnerHTML,true)
 }
 
 function judgeRemoveStyle(styleName: string) {
@@ -257,7 +263,7 @@ document.onpaste = function (event) {
                     document.activeElement?.querySelector('img')?.remove()
                     if(!(document.activeElement instanceof HTMLElement)) return
                     document.activeElement?.blur()
-                    createParagraphChild("img_part",event.target.result! as string)
+                    createParagraphChild(img_part as cpChildType,null,true,event.target.result! as string)
                 }
             }; 
             reader.readAsDataURL(blob!);
@@ -297,16 +303,7 @@ function addMoveBlockEvt(el: HTMLElement) {
             const pageScroll = document.getElementById("mainContent_scrollSection_ID")!.scrollTop
             const mousePosition = pageScroll + event.pageY
             // 移除先前所有highlight
-            if(allElement[0]?.classList.contains(img_top_highlight_class)) {
-                allElement[0]?.classList.remove(img_top_highlight_class)
-            }
-            for(let index=0;index<allElHeightRange.length;index++) {
-                if( 
-                    allElement[index]?.classList.contains(img_highlight_class)
-                ){
-                    allElement[index].classList.remove(img_highlight_class)
-                }
-            }
+            removeAllHighlight(allElement)
             // 設定新的highlight
             afterElMoveIndex = null
             for(let index=0;index<allElHeightRange.length;index++) {
@@ -349,22 +346,30 @@ function addMoveBlockEvt(el: HTMLElement) {
     }
 
     function handlePointerUp() {
-        if(afterElMoveIndex) {
+        const allElement = paragraphRef.value!.children
+        if(afterElMoveIndex || afterElMoveIndex === 0) {
+            const bmEl = allElement[nowElementIndex as number] as HTMLElement
+            const elType = bmEl.dataset.tagPurpose as cpChildType
+            const bmElInnerHtml = bmEl.innerHTML
+            const cloneEl = createParagraphChild(elType,bmElInnerHtml,false)
             // TODO 最後index parentNode.appendChild()
             if(afterElMoveIndex === allElLength) {
-                
+                paragraphRef.value?.appendChild(cloneEl)
+                bmEl.remove()
             } 
             // TODO 其它index (parentNode.insertBefore(newNode,prevNode))
             else {
-
+                const prevEl = allElement[afterElMoveIndex]
+                paragraphRef.value?.insertBefore(cloneEl,prevEl)
+                bmEl.remove()
             }
 
             afterElMoveIndex = null
         }
         nowElementIndex = null
+        removeAllHighlight(allElement)
         setTimeout(()=>{
             isholdingEL.value = false
-            console.log('trigger up')
         },200)
         window.removeEventListener("pointermove",handlePointerMove)
         window.removeEventListener("pointerup",handlePointerUp)
@@ -372,44 +377,88 @@ function addMoveBlockEvt(el: HTMLElement) {
 }
 
 type cpChildType = "edit_text" | "img_part"
-function createParagraphChild(elType: cpChildType,imgSRC:string|null=null) {
+function createParagraphChild(
+    elType: cpChildType, innerHTML: string|null, isInit=false, imgSRC:string|null=null
+) {
     switch(elType) {
         case "edit_text":
-            createEditText()
-            break;
+            return createEditText(elType,innerHTML as string,isInit)
         case "img_part":
-            createImgPart(imgSRC!)
-            break;
+            return createImgPart(innerHTML,imgSRC!)
     }
 }
 
-function createEditText() {
+function createEditText(elType: cpChildType,innerHTML: string,isInit: boolean) {
     const newParagraph = document.createElement('div')
     newParagraph.classList.add(text_edit_paragraph_class)
     newParagraph.contentEditable = "true"
-    newParagraph.innerHTML = `你好<span style="background-color:blue;margin:4px">哇哇</span>阿阿<span style="background-color: rgb(241, 198, 57);">我哇</span>哇我很好耶`
-    newParagraph.addEventListener("click",(event)=> event.stopPropagation())
-    newParagraph.addEventListener("focus",()=> isEdit.value = true)
-    newParagraph.addEventListener("blur",()=>  setTimeout(()=> isEdit.value = false,200))
+    newParagraph.innerHTML = innerHTML
+    newParagraph.dataset.tagPurpose = edit_text
     newParagraph.id = new Date().toISOString()
-    addMoveBlockEvt(newParagraph)
-    paragraphRef.value!.appendChild(newParagraph)
-    newParagraph.focus()
+
+    addElEvtListener(elType,newParagraph)
+
+    if(isInit) {
+        paragraphRef.value!.appendChild(newParagraph)
+        newParagraph.focus()
+    }
+
+    return newParagraph
 }
 
-function createImgPart(imgSRC: string) {
+function addElEvtListener(elType: cpChildType,el: HTMLElement){
+    switch(elType) {
+        case "edit_text":
+            el.addEventListener("click",(event)=> event.stopPropagation())
+            el.addEventListener("focus",()=> isEdit.value = true)
+            el.addEventListener("blur",()=>  setTimeout(()=> isEdit.value = false,200))
+            addMoveBlockEvt(el)
+            break
+        case "img_part":
+            addMoveBlockEvt(el)
+            break
+    }
+    
+}
+
+function createImgPart(innerHTML: string|null,imgSRC: string) {
     const wrapperDiv = document.createElement('div')
-    const innerImg = document.createElement('img')
-    innerImg.src = imgSRC
     wrapperDiv.style.display = 'flex'
     wrapperDiv.style.justifyContent = 'center'
     wrapperDiv.style.width = '100%'
-    innerImg.draggable = false
+    wrapperDiv.draggable = false
     wrapperDiv.id = new Date().toISOString()
-    addMoveBlockEvt(wrapperDiv)
+    wrapperDiv.dataset.tagPurpose = img_part
+    
 
-    wrapperDiv.appendChild(innerImg)
-    paragraphRef.value!.appendChild(wrapperDiv)
+    if(!innerHTML) {
+        const innerImg = document.createElement('img')
+        innerImg.src = imgSRC
+        innerImg.draggable = false
+        wrapperDiv.appendChild(innerImg)
+        paragraphRef.value!.appendChild(wrapperDiv)
+    } else{
+        wrapperDiv.innerHTML = innerHTML
+    }
+
+    addElEvtListener(img_part as cpChildType, wrapperDiv)
+    return wrapperDiv
+}
+
+function removeAllHighlight(allElement: HTMLCollection) {
+    if(allElement[0]?.classList.contains(img_top_highlight_class)) {
+        allElement[0]?.classList.remove(img_top_highlight_class)
+    }
+
+    for(let index=0;index<allElHeightRange.length;index++) {
+        const elClassList = allElement[index]?.classList
+        const isHighLight = elClassList?.contains(img_highlight_class)
+                            || elClassList?.contains(img_top_highlight_class)
+        if(isHighLight){
+            elClassList.remove(img_highlight_class)
+            elClassList.remove(img_top_highlight_class)
+        }
+    }
 }
 
 
@@ -419,7 +468,6 @@ function init() {
         const bottomEptSection = document.getElementById('bottom_empty_section') as HTMLElement
         const btnSectionHeight = getComputedStyle(btnSection,'height')
         const bottomEptHeight = getComputedStyle(bottomEptSection,'height')
-        console.log(bottomEptHeight)
         paragraphRef.value!.style.setProperty('--btn_section_height',`${btnSectionHeight}px`)
         paragraphRef.value!.style.setProperty('--bottom_ept_section',`${bottomEptHeight}px`)
     })
