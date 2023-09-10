@@ -33,11 +33,12 @@ const {isEdit,isholdingEL} = {
 }
 const {
     img_highlight_class,img_top_highlight_class,text_edit_paragraph_class,
-    edit_text,img_part
+    not_selectable_calss,edit_text,img_part
 } = {
     img_highlight_class: "img_move_hightlight",
     img_top_highlight_class: "img_move_top_hightlight",
     text_edit_paragraph_class: "edit_text_paragraph",
+    not_selectable_calss: "not_selectable",
     img_part: "img_part",
     edit_text: "edit_text"
 }
@@ -278,23 +279,30 @@ function getComputedStyle(el: HTMLElement,styKey: string) {
     return computedValue
 }
 
+let timer: ReturnType<typeof setTimeout>;
 function addMoveBlockEvt(el: HTMLElement) {
     el.addEventListener("pointerdown",()=> {
-        allElHeightRange = []
-        isholdingEL.value = true
-        const allElement = paragraphRef.value!.children
-        allElLength = allElement.length
-        const pageScroll = document.getElementById("mainContent_scrollSection_ID")!.scrollTop
-        for(let i=0;i<allElement!.length;i++){
-            const eachEl = allElement[i] as HTMLElement
-            const elHeight = pageScroll + eachEl.getBoundingClientRect().top
-            allElHeightRange.push(elHeight)
-            if(eachEl.id && el.id === eachEl.id) {
-                nowElementIndex = i
+        // 若使用者正在編輯，不進行移動區塊處理
+        if(isEdit.value) return
+        // 清除timeout，若使用者點擊元素超過1秒，觸發移動區塊處理
+        clearTimeout(timer)
+        timer = setTimeout(()=> { 
+            allElHeightRange = []
+            isholdingEL.value = true
+            const allElement = paragraphRef.value!.children
+            allElLength = allElement.length
+            const pageScroll = document.getElementById("mainContent_scrollSection_ID")!.scrollTop
+            for(let i=0;i<allElement!.length;i++){
+                const eachEl = allElement[i] as HTMLElement
+                const elHeight = pageScroll + eachEl.getBoundingClientRect().top
+                allElHeightRange.push(elHeight)
+                if(eachEl.id && el.id === eachEl.id) {
+                    nowElementIndex = i
+                }
             }
-        }
-        window.addEventListener('pointermove',handlePointerMove)
-        window.addEventListener("pointerup",handlePointerUp)
+            window.addEventListener('pointermove',handlePointerMove)
+            window.addEventListener("pointerup",handlePointerUp)
+        },1000)
     })
 
     function handlePointerMove(event: PointerEvent) {
@@ -346,6 +354,11 @@ function addMoveBlockEvt(el: HTMLElement) {
     }
 
     function handlePointerUp() {
+        console.log('tiggerup')
+        if(!isholdingEL.value) {
+            clearTimeout(timer)
+        }
+        // 移動元素
         const allElement = paragraphRef.value!.children
         if(afterElMoveIndex || afterElMoveIndex === 0) {
             const bmEl = allElement[nowElementIndex as number] as HTMLElement
@@ -367,10 +380,13 @@ function addMoveBlockEvt(el: HTMLElement) {
             afterElMoveIndex = null
         }
         nowElementIndex = null
+        // 清除所有highlight
         removeAllHighlight(allElement)
+        // 清除holdingEl
         setTimeout(()=>{
             isholdingEL.value = false
         },200)
+        // 清除移動事件
         window.removeEventListener("pointermove",handlePointerMove)
         window.removeEventListener("pointerup",handlePointerUp)
     }
@@ -391,7 +407,8 @@ function createParagraphChild(
 function createEditText(elType: cpChildType,innerHTML: string,isInit: boolean) {
     const newParagraph = document.createElement('div')
     newParagraph.classList.add(text_edit_paragraph_class)
-    newParagraph.contentEditable = "true"
+    newParagraph.classList.add(not_selectable_calss)
+    newParagraph.contentEditable = "false"
     newParagraph.innerHTML = innerHTML
     newParagraph.dataset.tagPurpose = edit_text
     newParagraph.id = new Date().toISOString()
@@ -399,6 +416,8 @@ function createEditText(elType: cpChildType,innerHTML: string,isInit: boolean) {
     addElEvtListener(elType,newParagraph)
 
     if(isInit) {
+        newParagraph.contentEditable = "true"
+        newParagraph.classList.remove(not_selectable_calss)
         paragraphRef.value!.appendChild(newParagraph)
         newParagraph.focus()
     }
@@ -409,9 +428,22 @@ function createEditText(elType: cpChildType,innerHTML: string,isInit: boolean) {
 function addElEvtListener(elType: cpChildType,el: HTMLElement){
     switch(elType) {
         case "edit_text":
-            el.addEventListener("click",(event)=> event.stopPropagation())
+            el.addEventListener("click",(event)=> {
+                if(isholdingEL.value) return
+                el.contentEditable = "true"
+                el.classList.remove(not_selectable_calss)
+                el.focus()
+                clearTimeout(timer)
+                event.stopPropagation()
+            })
             el.addEventListener("focus",()=> isEdit.value = true)
-            el.addEventListener("blur",()=>  setTimeout(()=> isEdit.value = false,200))
+            el.addEventListener("blur",()=>  {
+                setTimeout(()=> {
+                    el.contentEditable = "false"
+                    el.classList.add(not_selectable_calss)
+                    isEdit.value = false
+                },200)
+            })
             addMoveBlockEvt(el)
             break
         case "img_part":
@@ -490,16 +522,18 @@ init()
         background-color: rgb(241, 198, 57);
     }
 
+    .not_selectable {
+        -webkit-user-select: none; /* Safari */
+        -ms-user-select: none; /* IE 10 and IE 11 */
+        user-select: none; /* Standard syntax */
+    }
+
     .img_move_hightlight {
         border-bottom: 5px solid #1effd5;
     }
     
     .img_move_top_hightlight {
         border-top: 5px solid #1effd5;
-    }
-
-    h2{
-        font-size: 36px;
     }
 </style>
 
