@@ -293,6 +293,7 @@ function addMoveBlockEvt(el: HTMLElement) {
             const allElement = paragraphRef.value!.children
             allElLength = allElement.length
             const pageScroll = document.getElementById("mainContent_scrollSection_ID")!.scrollTop
+            document.getElementById("mainContent_scrollSection_ID")!.style.touchAction = 'none'
             for(let i=0;i<allElement!.length;i++){
                 const eachEl = allElement[i] as HTMLElement
                 const elHeight = pageScroll + eachEl.getBoundingClientRect().top
@@ -366,6 +367,7 @@ function addMoveBlockEvt(el: HTMLElement) {
         console.log('tiggerup')
         if(!isholdingEL.value) {
             clearTimeout(timer)
+            document.getElementById("mainContent_scrollSection_ID")!.style.touchAction = ''
         }
         // 移動元素
         const allElement = paragraphRef.value!.children
