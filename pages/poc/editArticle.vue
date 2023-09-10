@@ -281,10 +281,11 @@ function getComputedStyle(el: HTMLElement,styKey: string) {
 
 let timer: ReturnType<typeof setTimeout>;
 function addMoveBlockEvt(el: HTMLElement) {
-    el.addEventListener("pointerdown",()=> {
+    el.addEventListener("pointerdown",(event: PointerEvent)=> {
         // 若使用者正在編輯，不進行移動區塊處理
         if(isEdit.value) return
         // 清除timeout，若使用者點擊元素超過1秒，觸發移動區塊處理
+        event.stopPropagation()
         clearTimeout(timer)
         timer = setTimeout(()=> { 
             allElHeightRange = []
@@ -307,6 +308,7 @@ function addMoveBlockEvt(el: HTMLElement) {
 
     function handlePointerMove(event: PointerEvent) {
         if(isholdingEL.value) {
+            event.stopPropagation()
             const allElement = paragraphRef.value!.children
             const pageScroll = document.getElementById("mainContent_scrollSection_ID")!.scrollTop
             const mousePosition = pageScroll + event.pageY
@@ -502,6 +504,8 @@ function init() {
         const bottomEptHeight = getComputedStyle(bottomEptSection,'height')
         paragraphRef.value!.style.setProperty('--btn_section_height',`${btnSectionHeight}px`)
         paragraphRef.value!.style.setProperty('--bottom_ept_section',`${bottomEptHeight}px`)
+        document.body.style.overflow = "hidden"
+        document.getElementsByTagName("html")[0].style.overflow = "hidden"
     })
 }
 
