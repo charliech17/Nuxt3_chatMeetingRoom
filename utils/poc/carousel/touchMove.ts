@@ -1,5 +1,6 @@
 let isScale = false
-const nowImgInfo = {scale: 1, distance: 0, x: 0, y: 0}
+export const imgList = [1,2,3]
+export let nowImgInfo = {scale: 1, distance: 0, x: 0, y: 0,nowIndex:0}
 let tyStart:number = 0, tyEnd:number = 0, 
     txStart:number = 0 , txEnd:number = 0
 let lastPointY:number = 0, lastPointX: number = 0
@@ -37,12 +38,7 @@ function handleMove(evt: Event) {
         if(isExcessBoundryX(img,moveX)) return
         
         // 若在邊界內，不移動外層translateX位置
-        evt.stopPropagation() 
-
-        // 將外層transform: translateX改成0
-        const outerTranslateX = `translateX(${0})`
-        const imgContainer = document.querySelector(".container_scale") as HTMLDivElement
-        handleTransform(imgContainer,'translateX',outerTranslateX)
+        evt.stopPropagation()
 
         // 更新translateX及translateY
         const translateY = `translateY(${moveY}px)`
@@ -77,18 +73,16 @@ function handleMove(evt: Event) {
         if(scale === 1) {
             img.style.transform = transformScale
         }
-        
-        const outerTranslateX = `translateX(${0})`
-        const imgContainer = document.querySelector(".container_scale") as HTMLDivElement
-        handleTransform(imgContainer,'translateX',outerTranslateX)
     }
 }
 
 function handleEnd(evt: Event) {
     if(isScale || (evt instanceof TouchEvent && evt.touches.length === 2)) {
         isScale = false
-        document.removeEventListener("touchmove",handleMove)
     } 
+    const evtTarget = evt.target!
+    evtTarget.removeEventListener("touchmove",handleMove)
+    evtTarget.removeEventListener("touchmove",handleEnd)
 }
 
 function distance(event: TouchEvent) {
@@ -121,4 +115,17 @@ function isExcessBoundryX(img: HTMLImageElement,moveX:number) {
     const excessLeft = (imgWidth - browserWitdh) / 2 - translateX
     const isExccesLeft = excessLeft < 0 
     return isExccesRight || isExccesLeft
+}
+
+export function resetImgInfo(img: HTMLElement) {
+    console.log('reset!!!')
+    img.style.transform = ""
+    isScale = false
+    nowImgInfo = {scale: 1, distance: 0, x: 0, y: 0, nowIndex: nowImgInfo.nowIndex}
+    txStart = 0
+    tyStart = 0 
+    txEnd = 0
+    tyEnd = 0
+    lastPointX = 0
+    lastPointY = 0
 }
