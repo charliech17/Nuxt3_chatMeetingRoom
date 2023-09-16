@@ -16,8 +16,7 @@
         use_deviceInfo_Store().deviceViewWidth  = windowWidth
 
         nextTick(()=> {
-            const headerElement = document.getElementsByClassName('headerSection')[0]
-            const headerHeight = window.getComputedStyle(headerElement,null).height
+            const headerHeight = calHeaderHeight()
             document.documentElement.style.setProperty('--headerHeight',  headerHeight)
         })
     }

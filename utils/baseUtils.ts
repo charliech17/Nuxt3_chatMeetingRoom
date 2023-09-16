@@ -122,4 +122,10 @@ export const isMobileDevice = () => {
     })(navigator.userAgent);
     return check;
 }
+
+export const calHeaderHeight = () => {
+    const headerElement = document.getElementsByClassName('headerSection')[0]
+    const headerHeight = window.getComputedStyle(headerElement,null).height
+    return headerHeight
+}
 // ############## type  ############## //

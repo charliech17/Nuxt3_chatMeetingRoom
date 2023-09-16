@@ -18,6 +18,7 @@
 
 <script setup lang="ts">
 import {editArticleIcons} from "@/utils/icons/editArticle"
+import { use_deviceInfo_Store } from '@/stores/deviceInfoStore'
 
 interface controlParm {
     allElHeightRange: number[],
@@ -48,6 +49,10 @@ let {allElHeightRange,nowElementIndex, afterElMoveIndex, allElLength}: controlPa
     nowElementIndex: null, // 目前元素在段落中排在第幾個位置(pointerdown才觸發，pointerup刪除),
     afterElMoveIndex: null,
 }
+let headerHeight: null | number =  null
+let btnSectionHeight: null | number = null
+let bottomEptHeight: null | number = null 
+const edit_section_mTop = 20
 
 function addStyle(styleName: string, styleValue: string) {
     // 沒有選取內容
@@ -319,17 +324,36 @@ function addMoveBlockEvt(el: HTMLElement) {
             event.stopPropagation()
             const allElement = paragraphRef.value!.children
             const pageScroll = document.getElementById("mainContent_scrollSection_ID")!.scrollTop
-            let mousePosition = pageScroll + (event instanceof MouseEvent ? event.pageY : event.touches[0].pageY)
+            const mousePosition = (event instanceof MouseEvent ? event.pageY : event.touches[0].pageY)
+            const mouseAbsPosition = pageScroll + mousePosition
             // 移除先前所有highlight
             removeAllHighlight(allElement)
             // 設定新的highlight
             afterElMoveIndex = null
             for(let index=0;index<allElHeightRange.length;index++) {
+                /* 滑鼠移動到最上方，頁面需往上滑動，以及滑鼠移到最下方，網頁需往下滑判斷: 
+                    往上滑動判斷: 
+                        1. 移動到畫面距離header小於8px距離 2. 整個頁面往下滑動超過按鈕部份及16px padding 
+                    往下滑動判斷:
+                        1. 移動到畫面距離頁面最下方小於8px距離 2. 滑鼠絕對位置，比從最上方元素加到最下方元素高度小。
+                */
+                if( mousePosition <= (8 + headerHeight!)
+                    && pageScroll > (btnSectionHeight! + 16)
+                ) {
+                    document.getElementById("mainContent_scrollSection_ID")!.scrollTop -= 0.1
+                } else if(
+                    mousePosition > (use_deviceInfo_Store().deviceViewHeight! - 8)
+                    && mouseAbsPosition < (
+                        headerHeight! + btnSectionHeight! + 16 + Number(getComputedStyle(paragraphRef.value!,'height')) + bottomEptHeight! + edit_section_mTop)
+                ) {
+                    const st = document.getElementById("mainContent_scrollSection_ID")!.scrollTop
+                    document.getElementById("mainContent_scrollSection_ID")!.scrollTop = st + 1 // scrollTop測試無法加小數
+                }
                 // 移動到最前對落，且原本位置不在最前段落
                 if( 
                     index === 0
                     && index !== nowElementIndex
-                    && mousePosition < allElHeightRange[index]
+                    && mouseAbsPosition < allElHeightRange[index]
                 ) {
                     afterElMoveIndex = 0
                     allElement[index]?.classList.add(img_top_highlight_class)
@@ -338,8 +362,8 @@ function addMoveBlockEvt(el: HTMLElement) {
                 // 移動到兩個段落之間，且不等於原本位置
                 if( 
                     allElHeightRange[index+1] 
-                    && mousePosition > allElHeightRange[index]
-                    && mousePosition < allElHeightRange[index+1]
+                    && mouseAbsPosition > allElHeightRange[index]
+                    && mouseAbsPosition < allElHeightRange[index+1]
                     && (index+1) !== nowElementIndex
                     && index !== nowElementIndex
                 ) {
@@ -352,8 +376,8 @@ function addMoveBlockEvt(el: HTMLElement) {
                 if(
                     index === allElHeightRange.length -1 
                     && index !== nowElementIndex
-                    && mousePosition > allElHeightRange[index-1]
-                    && mousePosition > (allElement[index].getBoundingClientRect().bottom + pageScroll)
+                    && mouseAbsPosition > allElHeightRange[index-1]
+                    && mouseAbsPosition > (allElement[index].getBoundingClientRect().bottom + pageScroll)
                 ) {
                     allElement[index]?.classList.add(img_highlight_class)
                     afterElMoveIndex = index + 1
@@ -503,14 +527,20 @@ function removeAllHighlight(allElement: HTMLCollection) {
     }
 }
 
+function calELHeight(id:string,propertyName: string) {
+    const el = document.getElementById(id) as HTMLElement //'btn-section'
+    const elHeight = getComputedStyle(el, propertyName) //height
+    return elHeight
+}
+
 function init() {
     nextTick(()=>{
-        const btnSection = document.getElementById('btn-section') as HTMLElement
-        const bottomEptSection = document.getElementById('bottom_empty_section') as HTMLElement
-        const btnSectionHeight = getComputedStyle(btnSection,'height')
-        const bottomEptHeight = getComputedStyle(bottomEptSection,'height')
+        headerHeight =   Number(calHeaderHeight().replace("px",""))
+        btnSectionHeight = Number(calELHeight("btn-section","height"))
+        bottomEptHeight = Number(calELHeight("bottom_empty_section","height"))
         paragraphRef.value!.style.setProperty('--btn_section_height',`${btnSectionHeight}px`)
         paragraphRef.value!.style.setProperty('--bottom_ept_section',`${bottomEptHeight}px`)
+        paragraphRef.value!.style.setProperty('--first_item_marginTop',`${edit_section_mTop}px`)
         document.body.style.overflow = "hidden"
         document.getElementsByTagName("html")[0].style.overflow = "hidden"
     })
@@ -526,8 +556,8 @@ init()
         line-height: 1.8rem;
         font-size: 1.2rem;
     }
-    .text-section > .edit_text_paragraph:nth-child(1) {
-        margin-top: 20px;
+    .text-section {
+        margin-top: var(--first_item_marginTop);
     }
     .edit_text_highlight {
         background-color: rgb(241, 198, 57);
