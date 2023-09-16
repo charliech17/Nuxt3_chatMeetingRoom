@@ -340,7 +340,7 @@ function addMoveBlockEvt(el: HTMLElement) {
                 if( mousePosition <= (8 + headerHeight!)
                     && pageScroll > (btnSectionHeight! + 16)
                 ) {
-                    document.getElementById("mainContent_scrollSection_ID")!.scrollTop -= 0.1
+                    document.getElementById("mainContent_scrollSection_ID")!.scrollTop -= 0.5
                 } else if(
                     mousePosition > (use_deviceInfo_Store().deviceViewHeight! - 8)
                     && mouseAbsPosition < (
