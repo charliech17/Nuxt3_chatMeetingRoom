@@ -15,6 +15,9 @@
         use_deviceInfo_Store().deviceViewHeight = windowHeight
         use_deviceInfo_Store().deviceViewWidth  = windowWidth
 
+        const mb_size = 768
+        use_deviceInfo_Store().isMobile = windowWidth  > mb_size ? false : true
+
         nextTick(()=> {
             const headerHeight = calHeaderHeight()
             document.documentElement.style.setProperty('--headerHeight',  headerHeight)

@@ -2,6 +2,7 @@
     <div>
         <section class="cover_bg">
             <div class="cover_sectionStyle">
+                <h1 class="h1_style">The Chat App</h1>
                 <div class="input-wrapper">
                     <input aria-label="Ask us anything">
                     <span class="placeholder"></span>
@@ -98,27 +99,49 @@
     }
 
     .cover_sectionStyle{
+        position: relative;
         margin: -16px auto 0 auto;
         width: calc(100vw);
         height: calc( (3223 / 4976) * (100vw) );
-        max-width: calc((4976/3223) * (var(--vh,1vh)*100 - 64px));
+        // max-width: calc((4976/3223) * (var(--vh,1vh)*100 - 64px));
         max-height: calc(var(--vh,1vh)*100 - 64px);
-        background-image: url('~/assets/image/index_cover1.jpg');
+        background-image: url('@/public/index_mb_bg.png');
         background-size: cover;
         background-repeat: no-repeat;
+        @media (min-width: 768px) {
+            background-image: url('@/public/index_bg.png');
+        }
     }
 
+    .h1_style{
+        font-size: 1.5rem;
+        position: absolute;
+        top: 30%;
+        transform: translateY(-50%);
+        margin-left: 1.5rem;
+        @media (min-width: 768px) {
+            margin-left: 1.5rem;
+            font-size: 3rem;
+        }
+    }
     .outer_wrapper{
         max-width: 1200px;
         margin: 0 auto;
     }
     .input-wrapper {
         display: block;
+        position: absolute;
+        top: 55%;
+        transform: translateY(-50%);
         font-family: monospace;
-        font-size: 125%;
-        width: 75%;
+        font-size: 1.2rem;
+        width: 60%;
         margin-left: 16px;
         color: #6A1B9A;
+        @media(min-width: 768px) {
+            width: 55%;
+            font-size: 2rem;
+        }
         > input,
         > .placeholder {
             display: block;
@@ -131,13 +154,14 @@
         > .placeholder {
             pointer-events: none;
             border-radius: 5px;
+            padding: 5px;
             @include typed(
             (
                 "Want to have video chat with other easily on website ?": (color: #EDE7F6, background: #6200ee),
                 "Want to Join many people meetings easily without any app ?": (color: #EDE7F6, background: #6200ee),
                 "The answer, chatApp!": (color: #EDE7F6, background: #6200ee),
             ),
-            1.5,
+            4,
             (
                 caret-width: 2px,
                 caret-space: 2px,

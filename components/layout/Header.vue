@@ -1,33 +1,51 @@
 <template>
     <div>
         <v-layout class="headerSection">
+        <!-- header條 -->
             <v-app-bar 
                 class="position-static" 
                 :class="use_deviceInfo_Store().systemColorChange ? 'text-white' : ''" 
                 :color="use_deviceInfo_Store().systemColorChange ? '#5f9ea0' : 'primary'"
             >
-                <template v-slot:prepend>
+                <template 
+                    v-if="use_deviceInfo_Store().isMobile"
+                    v-slot:prepend 
+                >
                     <v-app-bar-nav-icon :icon="headerMdiIcons.mdiMenu" @click="isShowDrawer = !isShowDrawer"></v-app-bar-nav-icon>
                 </template>
-                <v-app-bar-title @click="navigateTo('/')">
+                <v-app-bar-title 
+                    class="md:ml-3"
+                    @click="navigateTo('/')"
+                >
                     chatApp
                 </v-app-bar-title>
                 <template v-slot:append>
-                    <v-btn 
-                        :icon="headerMdiIcons.mdiAccountCircle" 
-                        @click="isShowUserInfo = !isShowUserInfo" 
-                        v-if="isLogin"
-                    />
-                    <v-btn 
-                        v-else
-                        variant="tonal" 
-                        class="bg-deep-purple-lighten-5 deep-purple-darken-4" 
-                        @click="navigateTo('/login')"
+                    <div
+                        v-if="!use_deviceInfo_Store().isMobile"
+                        class="mr-3 md:block"
                     >
-                        登入
-                    </v-btn>
+                        <NavItems
+                            @changeShowDrawer="(isShow) => isShowDrawer = isShow"
+                        />
+                    </div>
+                    <div>
+                        <v-btn 
+                            :icon="headerMdiIcons.mdiAccountCircle" 
+                            @click="isShowUserInfo = !isShowUserInfo" 
+                            v-if="isLogin"
+                        />
+                        <v-btn 
+                            v-else
+                            variant="tonal" 
+                            class="bg-deep-purple-lighten-5 deep-purple-darken-4" 
+                            @click="navigateTo('/login')"
+                        >
+                            登入
+                        </v-btn>
+                    </div>
                 </template>
             </v-app-bar>
+            <!-- 手機版漢堡展開選單 -->
             <v-navigation-drawer
                 class="menu_drawer"
                 v-model="isShowDrawer"
@@ -35,11 +53,11 @@
                 temporary
                 :absolute="true"
             >
-                <v-list-item class="py-5 clickEffect" :prepend-icon="headerMdiIcons.mdiBookEducationOutline" title="切換色系" value="education" @click="()=>handleMenuDraweItems('changeColor')"/>
-                <v-list-item class="py-5 clickEffect" :prepend-icon="headerMdiIcons.mdiAccountGroup" title="前往會議資訊" value="room" @click="()=>handleMenuDraweItems('room')"/>
-                <v-list-item class="py-5 clickEffect" :prepend-icon="headerMdiIcons.mdiBookEducationOutline" title="前往使用說明" value="education" @click="()=>handleMenuDraweItems('education')"/>
-                <v-list-item class="py-5 clickEffect" :prepend-icon="headerMdiIcons.mdiCurrencyUsd" title="贊助" value="sponser" @click="()=>handleMenuDraweItems('sponser')"/>
+                <NavItems
+                    @changeShowDrawer="(isShow) => isShowDrawer = isShow"
+                />
             </v-navigation-drawer>
+            <!-- 登入資訊選單 -->
             <v-navigation-drawer
                 v-model="isShowUserInfo"
                 class="userInfo_drawer"
@@ -70,70 +88,71 @@
 </template>
 
 <script lang="ts" setup>
-    import { useAuthStore } from '@/stores/authStore'
-    import { use_deviceInfo_Store } from '@/stores/deviceInfoStore'
-    import { signOutUser } from '@/utils/firebase/auth'
-    import { headerMdiIcons } from '@/utils/icons/HeaderIconUtils'
+import { useAuthStore } from '@/stores/authStore'
+import { use_deviceInfo_Store } from '@/stores/deviceInfoStore'
+import { signOutUser } from '@/utils/firebase/auth'
+import { headerMdiIcons } from '@/utils/icons/HeaderIconUtils'
+import NavItems from "@/components/base/NavItems.vue"
     
-    const isShowDrawer    = ref(false)
-    const isShowUserInfo  = ref(false)
-    const isLogin         = computed(() => useAuthStore().isAuth)
-    const userName = computed(()=> {
-        const getUserName = useAuthStore().displayName
-        return getUserName ? getUserName : ''
-    })
-    const userImg = computed(()=> {
-        const saveURL = useAuthStore().photoURL
-        const userImgurl = saveURL ? saveURL : 'https://randomuser.me/api/portraits/women/81.jpg'
-        return userImgurl
-    })
+const isShowDrawer    = ref(false)
+const isShowUserInfo  = ref(false)
+const isLogin         = computed(() => useAuthStore().isAuth)
+const userName = computed(()=> {
+    const getUserName = useAuthStore().displayName
+    return getUserName ? getUserName : ''
+})
+const userImg = computed(()=> {
+    const saveURL = useAuthStore().photoURL
+    const userImgurl = saveURL ? saveURL : 'https://randomuser.me/api/portraits/women/81.jpg'
+    return userImgurl
+})
 
-    const handleBackHome = () => {
-        console.log(useRoute().path,'path')
-        if(useRoute().path === '/') {
-            console.log('isHome')
+const handleBackHome = () => {
+    console.log(useRoute().path,'path')
+    if(useRoute().path === '/') {
+        console.log('isHome')
+        isShowDrawer.value = false
+    } else {
+        navigateTo('/');
+        isShowDrawer.value = false
+    }
+}
+
+
+const changeUserInfo = () => {
+    navigateTo('/userInfo')
+    isShowUserInfo.value = false
+}
+
+
+const logoutUser = async () => {
+    await signOutUser()
+    isShowUserInfo.value = false
+    useRouter().replace('/')
+}
+
+
+const handleMenuDraweItems = async (triggerItems: 'room' | 'education' | 'sponser' | 'changeColor' ) => {
+    switch(triggerItems) {
+        case 'changeColor':
+            use_deviceInfo_Store().changeSystemColor()
             isShowDrawer.value = false
-        } else {
-            navigateTo('/');
+            break
+        case 'room' :
+            navigateTo('/room')
             isShowDrawer.value = false
-        }
+            break
+        case 'education':
+            isShowDrawer.value = false
+            // TODO 導至教學頁面
+            alert('敬請期待')
+            break
+        case 'sponser':
+            isShowDrawer.value = false
+            navigateTo('/donation')
+            break
     }
-
-
-    const changeUserInfo = () => {
-        navigateTo('/userInfo')
-        isShowUserInfo.value = false
-    }
-
-
-    const logoutUser = async () => {
-        await signOutUser()
-        isShowUserInfo.value = false
-        useRouter().replace('/')
-    }
-
-
-    const handleMenuDraweItems = async (triggerItems: 'room' | 'education' | 'sponser' | 'changeColor' ) => {
-        switch(triggerItems) {
-            case 'changeColor':
-                use_deviceInfo_Store().changeSystemColor()
-                isShowDrawer.value = false
-                break
-            case 'room' :
-                navigateTo('/room')
-                isShowDrawer.value = false
-                break
-            case 'education':
-                isShowDrawer.value = false
-                // TODO 導至教學頁面
-                alert('敬請期待')
-                break
-            case 'sponser':
-                isShowDrawer.value = false
-                navigateTo('/donation')
-                break
-        }
-    }
+}
 
 </script>
 

@@ -6,10 +6,8 @@ export const use_deviceInfo_Store = defineStore('deviceInfo', {
             deviceViewHeight: null,
             deviceViewWidth: null,
             systemColorChange: false,
+            isMobile: false
         }
-    },
-    getters: {
-
     },
     actions: {
         saveDeviceState(saveParameter: saveParameterType, saveValue: number) {
@@ -33,7 +31,8 @@ export const use_deviceInfo_Store = defineStore('deviceInfo', {
 interface State {
     deviceViewHeight: null | number
     deviceViewWidth: null | number
-    systemColorChange: boolean
+    systemColorChange: boolean,
+    isMobile: boolean
 }
 
 type saveParameterType = 'deviceViewHeight'| 'deviceViewWidth'
