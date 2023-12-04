@@ -7,12 +7,18 @@
                     <input aria-label="Ask us anything">
                     <span class="placeholder"></span>
                 </div>
+                <div class="first_img_part">
+                    <img :class="{'img_show': showImg.img1}" src="@/index/main.gif" alt="">
+                    <!-- <img :class="{'img_show': showImg.img2}" src="@/index/network.png" alt="">
+                    <img :class="{'img_show': showImg.img3}" src="@/index/celebrating.png" alt="">
+                    <img :class="{'img_show': showImg.img4}" src="@/index/chat.png" alt=""> -->
+                </div>
             </div>
         </section>
         <section class="outer_wrapper">
             <div class="text-center mt-8">
                 <div class="flex justify-center align-center gap-2">
-                    <v-icon color="#8a2be2" :icon="isAuth ? mdiEmoticonOutline : mdiHelpCircleOutline"></v-icon>
+                    <v-icon color="#07304e" :icon="isAuth ? mdiEmoticonOutline : mdiHelpCircleOutline"></v-icon>
                     <h1 class="text-2xl">{{isAuth ? '開始使用' : '有帳號嗎'}}</h1>
                 </div>
                 <div class="mt-4">
@@ -57,7 +63,12 @@
     import { useAuthStore } from '@/stores/authStore'
     import mdiEmoticonOutline from '~icons/mdi/emoticon-outline'
     import mdiHelpCircleOutline from '~icons/mdi/help-circle-outline'
-
+    const showImg = ref({
+        img1: false,
+        img2: false,
+        img3: false,
+        img4: false
+    })
     const topAttractiveParamenters = reactive([
         {
             imgPath: new URL('@/assets/image/icon/index_easy.png', import.meta.url).href,
@@ -83,7 +94,15 @@
         return useAuthStore().isAuth
     })
 
-
+    onMounted(()=> {
+        setTimeout(()=>{
+            for(const key in showImg.value) {
+                // @ts-ignore
+                // console.log(showImg.value[key])
+                showImg.value[key] = true
+            }
+        },100)
+    })
     onUnmounted(()=> {
         document.body.style.backgroundColor = ''
         document.body.style.color = ''
@@ -105,11 +124,40 @@
         height: calc( (3223 / 4976) * (100vw) );
         // max-width: calc((4976/3223) * (var(--vh,1vh)*100 - 64px));
         max-height: calc(var(--vh,1vh)*100 - 64px);
-        background-image: url('@/public/index_mb_bg.png');
+        background-image: url('@/index/index_bg.png');
         background-size: cover;
         background-repeat: no-repeat;
         @media (min-width: 768px) {
-            background-image: url('@/public/index_bg.png');
+            background-image: url('@/index/index_bg.png');
+        }
+
+        .first_img_part {
+            position: relative;
+            width: 100%;
+            height: 100%;
+
+            img {
+                position: absolute;
+                width: 150px;
+                transition: 1.5s;
+                @media (min-width: 768px) {
+                    width: 400px;
+                    opacity: 0.2;
+                }
+            }
+
+            img:nth-child(1) {
+                right: 5%;
+                top: 20%;
+                @media (min-width: 768px) {
+                    right: 10%;
+                    top: 20%;
+                }
+            }
+
+            .img_show {
+                opacity: 1;
+            }
         }
     }
 
@@ -131,8 +179,9 @@
     .input-wrapper {
         display: block;
         position: absolute;
-        top: 55%;
+        top: 35%;
         transform: translateY(-50%);
+        height: 30px;
         font-family: monospace;
         font-size: 1.2rem;
         width: 60%;
@@ -157,9 +206,9 @@
             padding: 5px;
             @include typed(
             (
-                "Want to have video chat with other easily on website ?": (color: #EDE7F6, background: #6200ee),
-                "Want to Join many people meetings easily without any app ?": (color: #EDE7F6, background: #6200ee),
-                "The answer, chatApp!": (color: #EDE7F6, background: #6200ee),
+                "Want to have video chat with other easily on website ?": (color: #EDE7F6, background: #415ca1),
+                "Want to Join many people meetings easily without any app ?": (color: #EDE7F6, background: #415ca1),
+                "The answer, chatApp!": (color: #EDE7F6, background: #415ca1),
             ),
             4,
             (
@@ -180,7 +229,7 @@
 
     .intoColorStyle{
         h2{
-            color: #8a2be2;
+            color: #012580;
         }
         p {
             color: black;

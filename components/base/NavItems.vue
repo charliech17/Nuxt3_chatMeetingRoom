@@ -16,7 +16,7 @@
         <span 
             v-for="info in listInfo"
             :value="info.value" 
-            class="mr-3 p-2 cursor-pointer hover:bg-yellow-600"
+            class="mr-3 p-2 cursor-pointer hover:bg-yellow-600 rounded-lg"
             @click="info.clickAction"
         >{{ info.title }}</span>
     </div>

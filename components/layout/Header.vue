@@ -3,9 +3,8 @@
         <v-layout class="headerSection">
         <!-- header條 -->
             <v-app-bar 
-                class="position-static" 
-                :class="use_deviceInfo_Store().systemColorChange ? 'text-white' : ''" 
-                :color="use_deviceInfo_Store().systemColorChange ? '#5f9ea0' : 'primary'"
+                class="position-static text-white" 
+                :color="use_deviceInfo_Store().systemColorChange ? '#5f9ea0' : '#07304e'"
             >
                 <template 
                     v-if="use_deviceInfo_Store().isMobile"

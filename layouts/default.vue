@@ -37,5 +37,6 @@
         height: calc(var(--vh,1vh)* 100 - var(--headerHeight));
         overflow-y: auto;
         overflow-x: hidden;
+        background-color: #f0f9fd82;
     }
 </style>
