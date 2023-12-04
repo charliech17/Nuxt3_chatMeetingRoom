@@ -8,10 +8,7 @@
                     <span class="placeholder"></span>
                 </div>
                 <div class="first_img_part">
-                    <img :class="{'img_show': showImg.img1}" src="@/index/main.gif" alt="">
-                    <!-- <img :class="{'img_show': showImg.img2}" src="@/index/network.png" alt="">
-                    <img :class="{'img_show': showImg.img3}" src="@/index/celebrating.png" alt="">
-                    <img :class="{'img_show': showImg.img4}" src="@/index/chat.png" alt=""> -->
+                    <img :class="{'img_show': showImg.img1}" src="/index/main.gif" alt="">
                 </div>
             </div>
         </section>
