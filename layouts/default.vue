@@ -21,6 +21,7 @@
         nextTick(()=> {
             const headerHeight = calHeaderHeight()
             document.documentElement.style.setProperty('--headerHeight',  headerHeight)
+            document.getElementsByTagName("html")[0].style.overflow = "hidden"
         })
     }
     

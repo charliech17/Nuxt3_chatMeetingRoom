@@ -110,16 +110,18 @@
     @import '@/assets/css/typed.scss';
 
     .cover_bg{
-        background: linear-gradient(#D1C4E9,#EDE7F6,#ccb0fd,#F3E5F5) ;
+        background-color: white;
         margin: auto -16px;
+        max-height: calc(var(--vh,1vh)*100 - 64px);
+        height: calc( (3223 / 4976) * (100vw) );
     }
 
     .cover_sectionStyle{
         position: relative;
         margin: -16px auto 0 auto;
-        width: calc(100vw);
-        height: calc( (3223 / 4976) * (100vw) );
-        max-height: calc(var(--vh,1vh)*100 - 64px);
+        width: 100%;
+        height: 100%;
+        max-width: 1024px;
         background-color: white;
 
         .first_img_part {

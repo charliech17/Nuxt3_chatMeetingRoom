@@ -30,11 +30,17 @@ import { use_deviceInfo_Store } from '@/stores/deviceInfoStore'
 const emit = defineEmits(['changeShowDrawer'])
 
 const listInfo = ref([
+    // {
+    //     icon: headerMdiIcons.mdiBookEducationOutline,
+    //     title: "切換色系",
+    //     value: "colorChange",
+    //     clickAction: ()=> handleMenuDraweItems('changeColor')
+    // },
     {
         icon: headerMdiIcons.mdiBookEducationOutline,
-        title: "切換色系",
+        title: "視訊通話試用",
         value: "colorChange",
-        clickAction: ()=> handleMenuDraweItems('changeColor')
+        clickAction: ()=> handleMenuDraweItems('tryVedioCall')
     },
     {
         icon: headerMdiIcons.mdiAccountGroup,
@@ -56,10 +62,10 @@ const listInfo = ref([
     }
 ])
 
-const handleMenuDraweItems = async (triggerItems: 'room' | 'education' | 'sponser' | 'changeColor' ) => {
+const handleMenuDraweItems = async (triggerItems: 'room' | 'education' | 'sponser' | 'tryVedioCall' ) => {
     switch(triggerItems) {
-        case 'changeColor':
-            use_deviceInfo_Store().changeSystemColor()
+        case 'tryVedioCall':
+            navigateTo("https://webrtc-chatroom.netlify.app/",{external: true})
             emit("changeShowDrawer",false)
             break
         case 'room' :
