@@ -122,14 +122,8 @@
         margin: -16px auto 0 auto;
         width: calc(100vw);
         height: calc( (3223 / 4976) * (100vw) );
-        // max-width: calc((4976/3223) * (var(--vh,1vh)*100 - 64px));
         max-height: calc(var(--vh,1vh)*100 - 64px);
-        background-image: url('@/index/index_bg.png');
-        background-size: cover;
-        background-repeat: no-repeat;
-        @media (min-width: 768px) {
-            background-image: url('@/index/index_bg.png');
-        }
+        background-color: white;
 
         .first_img_part {
             position: relative;
