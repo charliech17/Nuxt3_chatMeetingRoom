@@ -15,7 +15,7 @@
                     :src="imageName.url" 
                     alt=""
                 />
-                <div class="mt-1">{{ imageName.word }}</div>
+                <div class="comment">{{ imageName.word }}</div>
             </div>
         </div>
     </div>
@@ -40,9 +40,13 @@
 
     onMounted(()=> {
         setPicList(nowPickList)
-        nextTick(()=> {
+        setTimeout(()=> {
             transformStart(carosuel_id.value)
-        })
+        },100)
+    })
+
+    onBeforeMount(()=> {
+        document.getElementById(carosuel_id.value)?.removeEventListener("animationend",handleTransitionEnd)
     })
 </script>
 
@@ -70,13 +74,23 @@
                 flex-direction: column;
                 align-items: center;
                 img{
-                    height: 180px;
-                    object-fit: contain;
-                    flex-shrink: 0;
-                    flex-basis: 100%;
+                    height: 200px;
                     display: inline-block;
+                }
+
+                .comment{
+                    height: 120px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    background-color: #0b5993;
+                    color: white;
+                    padding: 8px;
+                    border-radius: 8px;
+                    margin-top: 16px;
+                    max-width: 300px;
                     @media (min-width: 768px) {
-                        height: 150px;
+                        margin-top: 24px;
+                        font-size: 16px;
                     }
                 }
             }

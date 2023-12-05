@@ -1,10 +1,10 @@
 const allPicList = ["1","2","3","4","5"]
 const word = [
-    "真的不錯用",
-    "很方便",
-    "好玩",
-    "你好",
-    "測試"
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolo incididunt ut labore",
+    "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam re",
+    "umquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima ",
+    "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti ",
+    "debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae.t"
 ]
 const baseAssetsPath = "/index/carousel/"
 let nowTransition = 100
@@ -32,7 +32,6 @@ export function handleLoop(nowPickList: Ref,imgContainerID: string) {
     imgContainer!.style.transition = ``
     
     nowPickList.value.shift()
-    console.log(nowPickList.value)
     const newData = Number(nowPickList.value[1].name) + 1
     const finalData = newData > allPicList.length  ? 1 : newData
     
@@ -48,13 +47,15 @@ export function handleLoop(nowPickList: Ref,imgContainerID: string) {
 
     setTimeout(()=>{
         transformStart(imgContainerID)
-    },4000)
+    },3000)
 }
 
 export function transformStart(imgContainerID: string) {
     const imgContainer = getImageContainer(imgContainerID)
-    imgContainer!.style.transition = `transform 1.5s`
-    imgContainer.style.transform = `translateX(-${nowTransition}%)`
+    if(imgContainer) {
+        imgContainer.style.transition = `transform 1.5s`
+        imgContainer.style.transform = `translateX(-${nowTransition}%)`
+    }
 }
 
 function getImageContainer(imgContainerID: string):HTMLElement {
