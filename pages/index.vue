@@ -38,8 +38,10 @@
                         <p class="mt-2">{{ parameter.contentTxt }}</p>
                     </div>
                 </div>
-                <div class="md:flex gap-2 mt-8">
-                    <v-img
+                <div class="mt-20 md:mb-16">
+                    <h2 class="text-center text-2xl">使用心得</h2>
+                    <Carousel class="mt-4"/>
+                    <!-- <v-img
                         src="https://picsum.photos/1920/1081?nature1"
                         class="bg-grey-lighten-2 mt-4"
                         :lazy-src="`https://picsum.photos/10/6`"
@@ -48,7 +50,7 @@
                         src="https://picsum.photos/1920/1081?nature2"
                         class="bg-grey-lighten-2 mt-4 d-none d-md-block"
                         :lazy-src="`https://picsum.photos/10/6`"
-                    ></v-img>
+                    ></v-img> -->
                 </div>
             </div>
         </section>
@@ -60,6 +62,8 @@
     import { useAuthStore } from '@/stores/authStore'
     import mdiEmoticonOutline from '~icons/mdi/emoticon-outline'
     import mdiHelpCircleOutline from '~icons/mdi/help-circle-outline'
+    import Carousel from "@/components/index/carousel.vue"
+
     const showImg = ref({
         img1: false,
         img2: false,
