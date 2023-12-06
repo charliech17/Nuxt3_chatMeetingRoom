@@ -10,12 +10,14 @@
                 :key="imageName.name"
                 class="each_card"
             >
+                <div class="left_btn innerBtn" @click="() => userTiggerSlide('l')"></div>
                 <img 
                     :id="'image_'+ index"
                     :src="imageName.url" 
                     alt=""
                 />
                 <div class="comment">{{ imageName.word }}</div>
+                <div class="right_btn innerBtn" @click="()=> userTiggerSlide('r')"></div>
             </div>
         </div>
     </div>
@@ -25,6 +27,7 @@
     import { handleLoop,setPicList,transformStart } from "@/utils/index/index"
 
     const isAutoPicture = ref(false)
+    const canSlide = ref(false)
     const carosuel_id = ref('index_carousel')
     const nowPickList = ref<nowPickListType[]>([])
 
@@ -35,15 +38,22 @@
     }
 
     function handleTransitionEnd() {
-        handleLoop(nowPickList,carosuel_id.value)
+        handleLoop(nowPickList,carosuel_id.value,canSlide)
     }
 
     onMounted(()=> {
         setPicList(nowPickList)
         setTimeout(()=> {
-            transformStart(carosuel_id.value)
+            canSlide.value = false
+            transformStart(carosuel_id.value,'r')
         },100)
     })
+
+    function userTiggerSlide(direct: "l" | "r") {
+        if(!canSlide.value) return
+        canSlide.value = false
+        transformStart(carosuel_id.value,direct)
+    }
 
     onBeforeMount(()=> {
         document.getElementById(carosuel_id.value)?.removeEventListener("animationend",handleTransitionEnd)
@@ -73,6 +83,7 @@
                 display: flex;
                 flex-direction: column;
                 align-items: center;
+                position: relative;
                 img{
                     height: 200px;
                     display: inline-block;
@@ -91,6 +102,22 @@
                     @media (min-width: 768px) {
                         margin-top: 24px;
                         font-size: 16px;
+                    }
+                }
+
+                .innerBtn{
+                    position: absolute;
+                    top: 30%;
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50%;
+                    background-color: #7d8e9c;
+                    opacity: 0.3;
+                    &.left_btn{
+                        left: 5%;
+                    }
+                    &.right_btn {
+                        right: 5%;
                     }
                 }
             }
