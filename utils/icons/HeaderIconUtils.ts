@@ -6,6 +6,7 @@ import mdiMenu from '~icons/mdi/menu'
 import mdiAccountGroup from '~icons/mdi/account-group'
 import mdiBookEducationOutline  from '~icons/mdi/book-education-outline'
 import mdiCurrencyUsd  from '~icons/mdi/currency-usd'
+import mdiLaptopAccount from '~icons/mdi/laptop-account'
 
 export const headerMdiIcons = {
     mdiAccountCircle,
@@ -16,4 +17,5 @@ export const headerMdiIcons = {
     mdiAccountGroup,
     mdiBookEducationOutline,
     mdiCurrencyUsd,
+    mdiLaptopAccount,
 }

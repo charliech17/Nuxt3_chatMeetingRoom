@@ -37,7 +37,7 @@ const listInfo = ref([
     //     clickAction: ()=> handleMenuDraweItems('changeColor')
     // },
     {
-        icon: headerMdiIcons.mdiBookEducationOutline,
+        icon: headerMdiIcons.mdiLaptopAccount,
         title: "視訊通話試用",
         value: "colorChange",
         clickAction: ()=> handleMenuDraweItems('tryVedioCall')
