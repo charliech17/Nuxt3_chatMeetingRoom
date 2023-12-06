@@ -36,6 +36,7 @@ export function handleLoop(nowPickList: Ref,imgContainerID: string,canSlide: Ref
     updateNowPickList(nowPickList,imgContainer,canSlide)
 
     timeout = setTimeout(()=>{
+        canSlide.value = false
         transformStart(imgContainerID,'r')
     },4000)
 }

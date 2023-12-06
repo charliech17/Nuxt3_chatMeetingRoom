@@ -10,14 +10,25 @@
                 :key="imageName.name"
                 class="each_card"
             >
-                <div class="left_btn innerBtn" @click="() => userTiggerSlide('l')"></div>
+                <!-- <div class="left_btn innerBtn" @click="() => userTiggerSlide('l')"></div> -->
+                <v-icon 
+                    :class="{'d-none': !canSlide}"
+                    class="left_btn innerBtn" 
+                    @click="() => userTiggerSlide('l')"
+                    :icon="mdiArrowLeftCircleOutline"
+                ></v-icon>
                 <img 
                     :id="'image_'+ index"
                     :src="imageName.url" 
                     alt=""
                 />
                 <div class="comment">{{ imageName.word }}</div>
-                <div class="right_btn innerBtn" @click="()=> userTiggerSlide('r')"></div>
+                <v-icon 
+                    :class="{'d-none': !canSlide}"
+                    class="right_btn innerBtn" 
+                    @click="()=> userTiggerSlide('r')"
+                    :icon="mdiArrowRightCircleOutline"
+                ></v-icon>
             </div>
         </div>
     </div>
@@ -25,8 +36,9 @@
 
 <script lang="ts" setup>
     import { handleLoop,setPicList,transformStart } from "@/utils/index/index"
+    import mdiArrowLeftCircleOutline from '~icons/mdi/arrow-left-circle-outline'
+    import mdiArrowRightCircleOutline from '~icons/mdi/arrow-right-circle-outline'
 
-    const isAutoPicture = ref(false)
     const canSlide = ref(false)
     const carosuel_id = ref('index_carousel')
     const nowPickList = ref<nowPickListType[]>([])
@@ -108,16 +120,22 @@
                 .innerBtn{
                     position: absolute;
                     top: 30%;
-                    width: 30px;
-                    height: 30px;
+                    width: 25px;
+                    height: 25px;
                     border-radius: 50%;
-                    background-color: #7d8e9c;
-                    opacity: 0.3;
+                    opacity: 0.5;
+                    color: #3d4a54;
+                    transition: all 1.5s;
                     &.left_btn{
                         left: 5%;
                     }
                     &.right_btn {
                         right: 5%;
+                    }
+
+                    @media (min-width: 768px) {
+                        width: 30px;
+                        height: 30px;
                     }
                 }
             }
