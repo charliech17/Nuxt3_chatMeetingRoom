@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { handleLoop,setPicList,transformStart } from "@/utils/index/index"
+    import { handleLoop,setPicList,transformStart } from "@/utils/index/carousel"
     import mdiArrowLeftCircleOutline from '~icons/mdi/arrow-left-circle-outline'
     import mdiArrowRightCircleOutline from '~icons/mdi/arrow-right-circle-outline'
 

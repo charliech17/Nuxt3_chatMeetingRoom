@@ -43,6 +43,12 @@
                         <p class="mt-2">{{ parameter.contentTxt }}</p>
                     </div>
                 </div>
+                <div class="mt-20 hide_scrollBar" id="teact_part">
+                    <h2 class="text-center text-2xl">步驟教學</h2>
+                    <div class="mt-6">
+                        <img style="max-width: none;max-height: 600px;" src="/index/teach.png" alt="">
+                    </div>
+                </div>
                 <div class="mt-20 md:mb-16">
                     <h2 class="text-center text-2xl">使用心得</h2>
                     <Carousel class="mt-4"/>
@@ -55,10 +61,9 @@
 
 <script lang="ts" setup>
     import { useAuthStore } from '@/stores/authStore'
-    // import mdiEmoticonOutline from '~icons/mdi/emoticon-outline'
-    // import mdiHelpCircleOutline from '~icons/mdi/help-circle-outline'
     import {indexImg} from "@/utils/icons/index"
     import Carousel from "@/components/index/carousel.vue"
+    import { initTeachPart } from "@/utils/index/leftScroll"
 
     const showImg = ref({
         img1: false,
@@ -92,14 +97,16 @@
         return useAuthStore().isAuth
     })
 
-    onMounted(()=> {
+    onMounted(async ()=> {
         setTimeout(()=>{
             for(const key in showImg.value) {
-                // @ts-ignore
-                // console.log(showImg.value[key])
+                //@ts-ignore
                 showImg.value[key] = true
             }
         },100)
+        await nextTick(()=> {})
+
+        initTeachPart()
     })
     onUnmounted(()=> {
         document.body.style.backgroundColor = ''
@@ -266,6 +273,12 @@
         }
         p {
             color: black;
+        }
+    }
+
+    .hide_scrollBar {
+        &::-webkit-scrollbar {
+            display: none;
         }
     }
 </style>
