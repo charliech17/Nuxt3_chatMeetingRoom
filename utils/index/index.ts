@@ -1,3 +1,5 @@
+import { use_deviceInfo_Store } from '@/stores/deviceInfoStore'
+
 const allPicList = ["1","2","3","4","5"]
 const word = [
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolo incididunt ut labore",
@@ -44,9 +46,10 @@ export function handleLoop(nowPickList: Ref,imgContainerID: string,canSlide: Ref
 export function transformStart(imgContainerID: string,lastDirection: 'l' | 'r') {
     clearTimeout(timeout)
     const imgContainer = getImageContainer(imgContainerID)
+    const isMobileDevice = use_deviceInfo_Store().isMobile
     saveLastDirection = lastDirection
     if(imgContainer) {
-        imgContainer.style.transition = `transform 1.5s`
+        imgContainer.style.transition = isMobileDevice ? `transform 1s` : `transform 1.5s`
         imgContainer.style.transform = lastDirection === "r" 
                                         ?`translateX(-${nowTransition}%)`
                                         :`translateX(${nowTransition}%)`
