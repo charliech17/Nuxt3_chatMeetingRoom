@@ -20,7 +20,7 @@
 
         nextTick(()=> {
             const headerHeight = calHeaderHeight()
-            document.documentElement.style.setProperty('--headerHeight',  headerHeight)
+            document.documentElement.style.setProperty('--headerHeight',  `${headerHeight}px`)
             document.getElementsByTagName("html")[0].style.overflow = "hidden"
         })
     }

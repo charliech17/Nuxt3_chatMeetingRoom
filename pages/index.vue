@@ -1,6 +1,6 @@
 <template>
     <div>
-        <section class="cover_bg">
+        <section class="cover_bg" ref="first_part">
             <div class="cover_sectionStyle">
                 <h1 class="h1_style">The Chat App</h1>
                 <div class="input-wrapper">
@@ -10,12 +10,17 @@
                 <div class="first_img_part">
                     <img :class="{'img_show': showImg.img1}" src="/index/main.gif" alt="">
                 </div>
+                <v-icon 
+                    :icon="indexImg.mdiArrowDown" 
+                    class="go_next_part" 
+                    @click="goNextpart"
+                ></v-icon>
             </div>
         </section>
         <section class="outer_wrapper">
             <div class="text-center mt-8">
                 <div class="flex justify-center align-center gap-2">
-                    <v-icon color="#07304e" :icon="isAuth ? mdiEmoticonOutline : mdiHelpCircleOutline"></v-icon>
+                    <v-icon color="#07304e" :icon="isAuth ? indexImg.mdiEmoticonOutline : indexImg.mdiHelpCircleOutline"></v-icon>
                     <h1 class="text-2xl">{{isAuth ? '開始使用' : '有帳號嗎'}}</h1>
                 </div>
                 <div class="mt-4">
@@ -41,16 +46,6 @@
                 <div class="mt-20 md:mb-16">
                     <h2 class="text-center text-2xl">使用心得</h2>
                     <Carousel class="mt-4"/>
-                    <!-- <v-img
-                        src="https://picsum.photos/1920/1081?nature1"
-                        class="bg-grey-lighten-2 mt-4"
-                        :lazy-src="`https://picsum.photos/10/6`"
-                    ></v-img>
-                    <v-img
-                        src="https://picsum.photos/1920/1081?nature2"
-                        class="bg-grey-lighten-2 mt-4 d-none d-md-block"
-                        :lazy-src="`https://picsum.photos/10/6`"
-                    ></v-img> -->
                 </div>
             </div>
         </section>
@@ -60,8 +55,9 @@
 
 <script lang="ts" setup>
     import { useAuthStore } from '@/stores/authStore'
-    import mdiEmoticonOutline from '~icons/mdi/emoticon-outline'
-    import mdiHelpCircleOutline from '~icons/mdi/help-circle-outline'
+    // import mdiEmoticonOutline from '~icons/mdi/emoticon-outline'
+    // import mdiHelpCircleOutline from '~icons/mdi/help-circle-outline'
+    import {indexImg} from "@/utils/icons/index"
     import Carousel from "@/components/index/carousel.vue"
 
     const showImg = ref({
@@ -70,6 +66,7 @@
         img3: false,
         img4: false
     })
+    const first_part = ref<HTMLElement|null>(null)
     const topAttractiveParamenters = reactive([
         {
             imgPath: new URL('@/assets/image/icon/index_easy.png', import.meta.url).href,
@@ -108,6 +105,14 @@
         document.body.style.backgroundColor = ''
         document.body.style.color = ''
     })
+
+    function goNextpart() {
+        const scrollSection = document.getElementById('mainContent_scrollSection_ID')
+        const moveTop = first_part.value!.getBoundingClientRect().bottom 
+                        + scrollSection!.scrollTop
+                        - calHeaderHeight()
+        smoothScroll(moveTop,'mainContent_scrollSection_ID',2) // 用原生scrollTo() 在ios上沒有smooth效果
+    }
 </script>
 
 <style lang="scss" scoped>
@@ -140,6 +145,7 @@
                 @media (min-width: 768px) {
                     width: 400px;
                     opacity: 0.2;
+                    pointer-events: none;
                 }
             }
 
@@ -154,6 +160,36 @@
 
             .img_show {
                 opacity: 1;
+            }
+        }
+
+        .go_next_part{
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            animation: 1s shine_animate infinite alternate;
+            cursor: pointer;
+            display: none;
+
+            @media (min-width: 768px) {
+                display: block;
+            }
+
+            @keyframes shine_animate {
+                0% {
+                    // opacity: 0;
+                    color: #012580;
+                    transform: translateY(-10px);
+                }
+
+                100% {
+                    color: #678ae1;
+                    transform: translateY(10px);
+                }
             }
         }
     }

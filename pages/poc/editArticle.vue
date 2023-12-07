@@ -535,7 +535,7 @@ function calELHeight(id:string,propertyName: string) {
 
 function init() {
     nextTick(()=>{
-        headerHeight =   Number(calHeaderHeight().replace("px",""))
+        headerHeight =  calHeaderHeight()
         btnSectionHeight = Number(calELHeight("btn-section","height"))
         bottomEptHeight = Number(calELHeight("bottom_empty_section","height"))
         paragraphRef.value!.style.setProperty('--btn_section_height',`${btnSectionHeight}px`)

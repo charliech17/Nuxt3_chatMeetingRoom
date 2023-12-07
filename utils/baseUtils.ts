@@ -126,6 +126,36 @@ export const isMobileDevice = () => {
 export const calHeaderHeight = () => {
     const headerElement = document.getElementsByClassName('headerSection')[0]
     const headerHeight = window.getComputedStyle(headerElement,null).height
-    return headerHeight
+    return Number(headerHeight.replace("px",""))
+}
+
+export function smoothScroll(targetHeight:number,scorllElId:string,moveFactor:number=5) {
+    if(moveFactor > 5 || moveFactor <= 0) {
+        throw new Error("moveFactor在1~5之間")
+    }
+    const scrollElement = document.getElementById(scorllElId)
+    if(!scrollElement) return
+
+    let curPos = scrollElement.scrollTop
+    let start: null|number = null
+    let pos = targetHeight
+    let time = Math.abs(targetHeight - curPos) / moveFactor
+
+    window.requestAnimationFrame(function step(curTime) {
+        start = !start ? curTime : start
+        let progress = curTime - start
+
+        if(curTime < pos) {
+            scrollElement.scrollTo(0,((pos-curPos)*progress / time)+curPos)
+        } else {
+            scrollElement.scrollTo(0,curPos - ((curPos - pos)*progress / time))
+        }
+
+        if(progress < time) {
+            window.requestAnimationFrame(step)
+        } else {
+            scrollElement.scrollTo(0,pos)
+        }
+    })
 }
 // ############## type  ############## //
