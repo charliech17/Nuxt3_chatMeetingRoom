@@ -3,21 +3,39 @@ import { calHeaderHeight } from "@/utils/baseUtils"
 
 let scrollSection: null| HTMLElement;
 let teact_part: null| HTMLElement;
+let teact_part_wrapper: null| HTMLElement;
+let teach_img: null| HTMLElement;
 let isInTeach = false
 let headerHeightMargin = 0;
+let scrollYPos = 0;
 
 function removeScrollEvtFuc() {
+    scrollYPos = scrollSection!.scrollTop
     scrollSection!.removeEventListener("scroll",handleScroll)
+    scrollSection!.addEventListener("scroll",handleInTeachScroll)
 }
 
 function handleScroll() {
     judgeScrollInside(removeScrollEvtFuc)
 }
 
+function handleInTeachScroll(evt: Event) {
+    const nowScrollY = scrollSection!.scrollTop
+    if(nowScrollY > scrollYPos) {
+        console.log("往下滑")
+    } else {
+        console.log("往上滑")
+    }
+    scrollYPos = nowScrollY
+}
+
 function judgeScrollInside(removeEvtFuc: Function) {
-    if(teact_part!.getBoundingClientRect().top <= headerHeightMargin && teact_part!.getBoundingClientRect().bottom > 0) {
-        const scrollSection = document.getElementById('mainContent_scrollSection_ID')
-        scrollSection!.style.overflow = "hidden"
+    if( teact_part_wrapper!.getBoundingClientRect().top <= calHeaderHeight() 
+        && teach_img!.getBoundingClientRect().bottom >= (
+            calHeaderHeight() 
+            + teach_img!.clientHeight
+        )
+    ) {
         teact_part!.style.overflowX = "auto"
         isInTeach = true
         removeEvtFuc()
@@ -45,33 +63,32 @@ function handleWheel(evt: WheelEvent) {
     }
 }
 
+
 function judgeMoveDirection(isMoveForward: boolean,handleFunc: Function, scollSpeed: number) {
     if(isMoveForward) {
-        teact_part!.scrollLeft = teact_part!.scrollLeft + scollSpeed
+        const newSL = teact_part!.scrollLeft + scollSpeed
+        smoothScroll(newSL,"teact_part",2,"x",isEnd)
         if(teact_part!.scrollLeft >= (teact_part!.scrollWidth - teact_part!.clientWidth - 3) ) {
-            const newScroll = scrollSection!.scrollTop + teact_part!.getBoundingClientRect().bottom
-            scrollSection!.style.overflow = ""
-            smoothScroll(newScroll,"mainContent_scrollSection_ID",1)
+            const newScroll = scrollSection!.scrollTop + teact_part_wrapper!.getBoundingClientRect().bottom
+            smoothScroll(newScroll,"mainContent_scrollSection_ID",3)
             isInTeach = false
-            teact_part!.style.overflowX = "hidden"
-            teact_part!.scrollLeft = 0
             handleFunc(isMoveForward)
         }
     } else {
-        teact_part!.scrollLeft = teact_part!.scrollLeft - scollSpeed
-        if(teact_part!.scrollLeft <= 0) {
-            teact_part!.style.overflowX = "hidden"
+        const newSL = teact_part!.scrollLeft - scollSpeed
+        smoothScroll(newSL,"teact_part",2,"x",isEnd)
+        if(teact_part!.scrollLeft <= 2) {
             teact_part!.scrollLeft = 0
-            const newScroll = scrollSection!.scrollTop - teact_part!.getBoundingClientRect().top
-            smoothScroll(newScroll,"mainContent_scrollSection_ID",2)
-            scrollSection!.style.overflow = ""
+            const newScroll = (scrollSection!.scrollTop - teact_part_wrapper!.scrollTop)
+            smoothScroll(newScroll,"mainContent_scrollSection_ID",1)
             isInTeach = false
             handleFunc(isMoveForward)
         }
     }
 }
 
-let txs=0,txe=0,tys=0,tye=0;
+let txs=0,txe=0,tys=0,tye=0,
+    tiys = 0,tixs = 0;
 
 function detectMobileScroll() {
     function removeEvtFuc() {
@@ -79,51 +96,73 @@ function detectMobileScroll() {
         window.addEventListener("touchmove",handleTouchMove)
         window.addEventListener("touchend",handleTouchEnd)
     }
-    window.requestAnimationFrame(function step() {
-        const isScrollInside = judgeScrollInside(removeEvtFuc)
-        if(isScrollInside) return
-
-        window.requestAnimationFrame(step)
-    })
+    setTimeout(()=> {
+        window.requestAnimationFrame(function step() {
+            const isScrollInside = judgeScrollInside(removeEvtFuc)
+            if(isScrollInside) return
+    
+            window.requestAnimationFrame(step)
+        })
+    },100)
 }
 
 function handleTouchStart(evt: TouchEvent) {
+    isEnd.endScroll = true
     txs = evt.touches[0].clientX
     tys = evt.touches[0].clientY
+    tiys = evt.touches[0].clientY
 }
 
-function removeTouchEvtFuc(isMoveForward: boolean) {
+function removeTouchEvtFuc() {
     window.removeEventListener("touchmove",handleTouchMove)
     window.removeEventListener("touchstart",handleTouchStart)
-    if(!isMoveForward) {
-        detectMobileScroll()
-    } 
+    detectMobileScroll()
 }
 
 function handleTouchMove(evt: TouchEvent) {
     txe = evt.touches[0].clientX
     tye = evt.touches[0].clientY
-
-    const scollSpeed = Math.abs(tye - tys)
-
-    if(tye < tys || txe < txs) { // 往下滑(手指往上)或往右滑(手指往左)
-        judgeMoveDirection(true,removeTouchEvtFuc,scollSpeed)
-    } else if(tye > tys || txe > txs) { // 往上滑(手指往下)或往左滑(手指往右)
-        judgeMoveDirection(false,removeTouchEvtFuc,scollSpeed)
-    }
-
     txs = txe, tys = tye
 }
 
-function handleTouchEnd() {
+let isEnd = {endScroll: false}
+function handleTouchEnd(evt: TouchEvent) {
     if(!isInTeach) {
         window.removeEventListener("touchend",handleTouchEnd)
+    } else {
+        isEnd.endScroll = true
+        let diff = (tye - tiys)
+        let sign = diff < 0 ? -1 : 1
+        const newSL = teact_part!.scrollLeft - diff
+        
+        while(Math.abs(diff) > 1.001) {
+            smoothScroll(newSL,"teact_part",0.7,"x",isEnd)
+            diff = Math.pow(Math.abs(diff),0.8) * sign
+        }
+        
+        if(teact_part!.scrollLeft >= (teact_part!.scrollWidth - teact_part!.clientWidth - 3) && sign < 0) {
+            isInTeach = false
+            removeTouchEvtFuc()
+        } else if(teact_part!.scrollLeft <= 10 && sign > 0) {
+            teact_part!.scrollLeft = 0
+            isInTeach = false
+            removeTouchEvtFuc()
+        } else{
+            const scrollRatio = Math.abs(newSL / (teact_part!.scrollWidth - teact_part!.clientWidth + ( window.innerHeight + calHeaderHeight())/2))
+            scrollSection!.scrollTop = 
+                (   scrollSection!.scrollTop 
+                    + (teact_part_wrapper!.getBoundingClientRect().top - calHeaderHeight())
+                    + teact_part_wrapper!.clientHeight * scrollRatio
+                )
+        }
     }
 }
 
 export function initTeachPart() {
     scrollSection = document.getElementById('mainContent_scrollSection_ID')
     teact_part = document.getElementById("teact_part")!
+    teact_part_wrapper = document.getElementById("teact_part_wrapper")!
+    teach_img = document.getElementById("teach_img")!
     headerHeightMargin = calHeaderHeight() + 16
     
     const {isMobile} = use_deviceInfo_Store()

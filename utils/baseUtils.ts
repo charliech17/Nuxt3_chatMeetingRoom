@@ -129,32 +129,50 @@ export const calHeaderHeight = () => {
     return Number(headerHeight.replace("px",""))
 }
 
-export function smoothScroll(targetHeight:number,scorllElId:string,moveFactor:number=5) {
+export function smoothScroll(targetHeight:number,scorllElId:string,moveFactor:number=5,direct: "x"| "y" = "y",isEnd:{endScroll: boolean}= {endScroll: false}) {
     if(moveFactor > 5 || moveFactor <= 0) {
         throw new Error("moveFactor在1~5之間")
     }
     const scrollElement = document.getElementById(scorllElId)
     if(!scrollElement) return
 
-    let curPos = scrollElement.scrollTop
+    let curPos = direct === "y" ?  scrollElement.scrollTop : scrollElement.scrollLeft
     let start: null|number = null
     let pos = targetHeight
     let time = Math.abs(targetHeight - curPos) / moveFactor
+    let raf:ReturnType<typeof requestAnimationFrame>
 
-    window.requestAnimationFrame(function step(curTime) {
+    raf = window.requestAnimationFrame(function step(curTime) {
+        if(isEnd.endScroll) {
+            isEnd.endScroll = false
+            cancelAnimationFrame(raf)
+            return
+        }
         start = !start ? curTime : start
         let progress = curTime - start
 
-        if(curTime < pos) {
-            scrollElement.scrollTo(0,((pos-curPos)*progress / time)+curPos)
+        if(direct === "y") {
+            if(curTime < pos) {
+                scrollElement.scrollTo(0,((pos-curPos)*progress / time)+curPos)
+            } else {
+                scrollElement.scrollTo(0,curPos - ((curPos - pos)*progress / time))
+            }
         } else {
-            scrollElement.scrollTo(0,curPos - ((curPos - pos)*progress / time))
+            if(curTime < pos) {
+                scrollElement.scrollTo(((pos-curPos)*progress / time)+curPos,0)
+            } else {
+                scrollElement.scrollTo(curPos - ((curPos - pos)*progress / time),0)
+            }
         }
 
         if(progress < time) {
             window.requestAnimationFrame(step)
         } else {
-            scrollElement.scrollTo(0,pos)
+            if(direct === "y") {
+                scrollElement.scrollTo(0,pos)
+            } else {
+                scrollElement.scrollTo(pos,0)
+            }
         }
     })
 }

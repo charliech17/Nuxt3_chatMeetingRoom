@@ -43,10 +43,19 @@
                         <p class="mt-2">{{ parameter.contentTxt }}</p>
                     </div>
                 </div>
-                <div class="mt-20 hide_scrollBar" id="teact_part">
-                    <h2 class="text-center text-2xl">步驟教學</h2>
-                    <div class="mt-6">
-                        <img style="max-width: none;max-height: 600px;" src="/index/teach.png" alt="">
+                <div class="mt-20" ref="teact_part_wrapper" id="teact_part_wrapper">
+                    <div ref="teact_part" id="teact_part">
+                        <h2 class="text-center text-2xl">步驟教學</h2>
+                        <div class="mt-4">
+                            <img 
+                                ref="teach_img"
+                                id="teach_img"
+                                @load="handleLoadImg"
+                                style="max-width: none;max-height: 600px;"  
+                                src="/index/teach.png" 
+                                alt=""
+                            >
+                        </div>
                     </div>
                 </div>
                 <div class="mt-20 md:mb-16">
@@ -72,6 +81,9 @@
         img4: false
     })
     const first_part = ref<HTMLElement|null>(null)
+    const teach_img = ref<HTMLElement|null>(null)
+    const teact_part = ref<HTMLElement|null>(null)
+    const teact_part_wrapper = ref<HTMLElement|null>(null)
     const topAttractiveParamenters = reactive([
         {
             imgPath: new URL('@/assets/image/icon/index_easy.png', import.meta.url).href,
@@ -119,6 +131,13 @@
                         + scrollSection!.scrollTop
                         - calHeaderHeight()
         smoothScroll(moveTop,'mainContent_scrollSection_ID',2) // 用原生scrollTo() 在ios上沒有smooth效果
+    }
+
+    function handleLoadImg(evt:Event) {
+        const headerHeight = calHeaderHeight()
+        teact_part_wrapper.value!.style.height = `${(teact_part.value!.clientHeight) + teach_img.value!.scrollWidth}px`
+        teact_part.value!.style.position = "sticky"
+        teact_part.value!.style.top = `${headerHeight}px`
     }
 </script>
 
