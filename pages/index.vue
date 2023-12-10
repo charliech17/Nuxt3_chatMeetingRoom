@@ -69,11 +69,13 @@
 
 
 <script lang="ts" setup>
+    import { use_deviceInfo_Store } from '@/stores/deviceInfoStore'
     import { useAuthStore } from '@/stores/authStore'
     import {indexImg} from "@/utils/icons/index"
     import Carousel from "@/components/index/carousel.vue"
     import { initTeachPart } from "@/utils/index/leftScroll"
 
+    const {isMobile} = use_deviceInfo_Store()
     const showImg = ref({
         img1: false,
         img2: false,
@@ -119,7 +121,10 @@
         },100)
         await nextTick(()=> {})
 
-        initTeachPart()
+        
+        if(isMobile) {
+            initTeachPart()
+        }
     })
     onUnmounted(()=> {
         document.body.style.backgroundColor = ''
@@ -135,6 +140,7 @@
     }
 
     function handleLoadImg(evt:Event) {
+        if(!isMobile) return
         teact_part_wrapper.value!.style.height = `${(teact_part.value!.clientHeight) + teach_img.value!.scrollWidth}px`
         teact_part.value!.style.position = "sticky"
         teact_part.value!.style.top = `0%`
@@ -294,6 +300,10 @@
         p {
             color: black;
         }
+    }
+
+    #teact_part{
+        overflow-x: auto;
     }
 
     .hide_scrollBar {
