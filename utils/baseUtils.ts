@@ -129,7 +129,7 @@ export const calHeaderHeight = () => {
     return Number(headerHeight.replace("px",""))
 }
 
-export function smoothScroll(targetHeight:number,scorllElId:string,moveFactor:number=5,direct: "x"| "y" = "y",isEnd:{endScroll: boolean}= {endScroll: false}) {
+export function smoothScroll(targetHeight:number,scorllElId:string,moveFactor:number=5,direct: "x"| "y" = "y",moveInfo:{endScroll: boolean,isMoving: boolean}= {endScroll: false,isMoving: true}) {
     if(moveFactor > 5 || moveFactor <= 0) {
         throw new Error("moveFactor在1~5之間")
     }
@@ -142,9 +142,11 @@ export function smoothScroll(targetHeight:number,scorllElId:string,moveFactor:nu
     let time = Math.abs(targetHeight - curPos) / moveFactor
     let raf:ReturnType<typeof requestAnimationFrame>
 
+    moveInfo.isMoving = true
     raf = window.requestAnimationFrame(function step(curTime) {
-        if(isEnd.endScroll) {
-            isEnd.endScroll = false
+        if(moveInfo.endScroll) {
+            moveInfo.endScroll = false
+            moveInfo.isMoving = false
             cancelAnimationFrame(raf)
             return
         }
@@ -173,6 +175,7 @@ export function smoothScroll(targetHeight:number,scorllElId:string,moveFactor:nu
             } else {
                 scrollElement.scrollTo(pos,0)
             }
+            moveInfo.isMoving = false
         }
     })
 }

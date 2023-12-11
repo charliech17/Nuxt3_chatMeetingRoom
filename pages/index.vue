@@ -122,9 +122,7 @@
         await nextTick(()=> {})
 
         
-        if(isMobile) {
-            initTeachPart()
-        }
+        initTeachPart()
     })
     onUnmounted(()=> {
         document.body.style.backgroundColor = ''
