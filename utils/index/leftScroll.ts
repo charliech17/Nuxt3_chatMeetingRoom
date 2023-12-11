@@ -145,7 +145,7 @@ function handleTouchEnd(evt: TouchEvent) {
             removeTouchEvtFuc()
             teact_part!.scrollLeft = 0
             const newScollY = scrollSection!.scrollTop + teact_part_wrapper!.getBoundingClientRect().top - teact_part!.clientHeight - calHeaderHeight()
-            smoothScroll(newScollY,"mainContent_scrollSection_ID",2)
+            smoothScroll(newScollY,"mainContent_scrollSection_ID",1.5)
         } else{
             // 修正垂直滾軸
             const scrollRatio = Math.abs(
