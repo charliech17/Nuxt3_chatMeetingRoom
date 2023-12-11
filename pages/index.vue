@@ -62,6 +62,27 @@
                     <h2 class="text-center text-2xl">使用心得</h2>
                     <Carousel class="mt-4"/>
                 </div>
+                <div class="mt-20 md:mb-16">
+                    <h2 class="text-center text-2xl">表達心情</h2>
+                    <div class="d-flex">
+                        <div class="reaction-icon-style">
+                            <v-menu
+                                v-model="menu"
+                                :close-on-content-click="true"
+                                location="top"
+                            >
+                                <template v-slot:activator="{ props }">
+                                    <v-icon 
+                                        :icon="indexImg.mdiEmoticonHappyOutline"  
+                                        v-bind="props"
+                                    ></v-icon>
+                                </template>
+                                <v-card class="ml-2">製作中...</v-card>
+                            </v-menu>
+
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     </div>
@@ -87,6 +108,7 @@
     const teact_part = ref<HTMLElement|null>(null)
     const teach_part_title = ref<HTMLElement|null>(null)
     const teact_part_wrapper = ref<HTMLElement|null>(null)
+    const menu = ref(false)
     const topAttractiveParamenters = reactive([
         {
             imgPath: new URL('@/assets/image/icon/index_easy.png', import.meta.url).href,
@@ -315,5 +337,19 @@
         top: 0;
         left: 50%;
         transform: translateX(-50%);
+    }
+
+    .reaction-icon-style{
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 1px solid rgb(104, 98, 98);
+        text-align: center;
+        margin: 16px auto 0;
+        cursor: pointer;
+        &:hover{
+            background-color: #415ca1;
+            color: white;
+        }
     }
 </style>
