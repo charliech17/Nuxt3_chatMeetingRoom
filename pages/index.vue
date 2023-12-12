@@ -64,7 +64,7 @@
                 </div>
                 <div class="mt-20 md:mb-16">
                     <h2 class="text-center text-2xl">表達心情</h2>
-                    <div class="d-flex">
+                    <div>
                         <div class="reaction-icon-style">
                             <v-menu
                                 v-model="menu"
@@ -77,9 +77,21 @@
                                         v-bind="props"
                                     ></v-icon>
                                 </template>
-                                <v-card class="ml-2">製作中...</v-card>
+                                <v-card class="ml-2 d-flex pa-3 gap-3">
+                                    <div 
+                                        v-for="items in moodItems"
+                                        :key="items.id"
+                                        class="moodItem-style"
+                                        @click="() => handleMoodClick(items.id)"
+                                    >{{ items.icon }}</div>
+                                </v-card>
                             </v-menu>
-
+                        </div>
+                        <div class="d-flex justify-center mt-4 gap-2">
+                            <div v-for="item,index in moodItems" :key="index" class="text-lg">
+                                <span class="mr-2">{{ item.icon }}</span>
+                                <span>{{ item.count }}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -95,6 +107,7 @@
     import {indexImg} from "@/utils/icons/index"
     import Carousel from "@/components/index/carousel.vue"
     import { initTeachPart } from "@/utils/index/leftScroll"
+    import { getRTDBData, setRTDBData, listenSpecifyDataChange } from "@/utils/firebase/useRTDB"
 
     const {isMobile} = use_deviceInfo_Store()
     const showImg = ref({
@@ -109,6 +122,13 @@
     const teach_part_title = ref<HTMLElement|null>(null)
     const teact_part_wrapper = ref<HTMLElement|null>(null)
     const menu = ref(false)
+    const moodItems = ref([
+        {icon:"👍",isSelect: false, id: "thumb_up",count:0},
+        {icon:"❤️",isSelect: false, id: "love",count:0},
+        {icon:"🎉",isSelect: false, id: "celebrate",count:0},
+        {icon:"🚀",isSelect: false, id: "rocket",count:0},
+        {icon:"👀",isSelect: false, id: "eyes",count:0}
+    ])
     const topAttractiveParamenters = reactive([
         {
             imgPath: new URL('@/assets/image/icon/index_easy.png', import.meta.url).href,
@@ -126,6 +146,9 @@
             contentTxt:'No need money, just enjoy your connection!',
         }
     ])
+
+    type moodHasType = [{id:string,count: number}]
+    type moodDataType = moodHasType | null
     document.body.style.backgroundColor = '#EDE7F6'
     document.body.style.color = '#333333'
     
@@ -141,10 +164,27 @@
                 showImg.value[key] = true
             }
         },100)
-        await nextTick(()=> {})
-
         
+        await nextTick(()=> {})
         initTeachPart()
+
+        const path = import.meta.env.VITE_FIREBASE_MOOD_SOCKET as string
+        listenSpecifyDataChange(
+            path,
+            (moodData: moodDataType)=> {
+                if(moodData && moodData.length > 0) {
+                    console.log(moodData)
+                    updateMoodDisplay(moodData)
+                }
+            },
+            ''
+        )
+
+        const hasVoted = localStorage["client_id"] as number
+        const canVote = (hasVoted && (new Date(hasVoted).getTime() > new Date().getTime()))
+        if(canVote) {
+            localStorage.removeItem("client_id")
+        }
     })
     onUnmounted(()=> {
         document.body.style.backgroundColor = ''
@@ -165,6 +205,42 @@
         teact_part.value!.style.position = "sticky"
         teact_part.value!.style.top = `0%`
         teach_part_title.value?.classList.add("sticky-title")
+    }
+
+    function updateMoodDisplay(moodData: moodDataType) {
+        if(!moodData || moodData.length <= 0) return 
+        moodItems.value.forEach((item)=> {
+            let index = 0
+            for(const fetchMood of moodData) {
+                if(item.id === fetchMood.id) {
+                    item.count = fetchMood.count
+                    break
+                }
+                index += 1
+            }
+            if(index < moodData.length) {
+                moodData.splice(index,1)
+            }
+        })
+    }
+
+    async function handleMoodClick(moodId: string) {
+        const path = import.meta.env.VITE_FIREBASE_MOOD_SOCKET as string
+        if(!localStorage["client_id"]) {
+            const data = await getRTDBData(path,'') as moodDataType
+            if(!data) {
+                const updateData = [{id:moodId,count: 1}]
+                setRTDBData(path,updateData,'')
+            } else {
+                const needUpdateMood = data?.find(moodItem => moodItem.id === moodId)
+                const updateData = needUpdateMood 
+                    ?  ((needUpdateMood.count += 1) && data) as moodHasType
+                    :  (data.push({id:moodId,count: 1}) && data) as moodHasType
+                setRTDBData(path,updateData,'')
+            }
+            // localStorage["client_id"] = new Date().getTime() +  (24 * 60 * 60 * 1000)
+            // localStorage["select_mood"] = moodId
+        }
     }
 </script>
 
@@ -350,6 +426,14 @@
         &:hover{
             background-color: #415ca1;
             color: white;
+        }
+    }
+    
+    .moodItem-style{
+        cursor: pointer;
+        padding: 4px;
+        &:hover{
+            background-color: #f3f0f7;
         }
     }
 </style>
