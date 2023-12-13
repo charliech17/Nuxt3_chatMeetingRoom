@@ -129,54 +129,57 @@ export const calHeaderHeight = () => {
     return Number(headerHeight.replace("px",""))
 }
 
-export function smoothScroll(targetHeight:number,scorllElId:string,moveFactor:number=5,direct: "x"| "y" = "y",moveInfo:{endScroll: boolean,isMoving: boolean}= {endScroll: false,isMoving: true}) {
-    if(moveFactor > 5 || moveFactor <= 0) {
-        throw new Error("moveFactor在1~5之間")
-    }
-    const scrollElement = document.getElementById(scorllElId)
-    if(!scrollElement) return
-
-    let curPos = direct === "y" ?  scrollElement.scrollTop : scrollElement.scrollLeft
-    let start: null|number = null
-    let pos = targetHeight
-    let time = Math.abs(targetHeight - curPos) / moveFactor
-    let raf:ReturnType<typeof requestAnimationFrame>
-
-    moveInfo.isMoving = true
-    raf = window.requestAnimationFrame(function step(curTime) {
-        if(moveInfo.endScroll) {
-            moveInfo.endScroll = false
-            moveInfo.isMoving = false
-            cancelAnimationFrame(raf)
-            return
+export async function smoothScroll(targetHeight:number,scorllElId:string,moveFactor:number=5,direct: "x"| "y" = "y",moveInfo:{endScroll: boolean,isMoving: boolean}= {endScroll: false,isMoving: true}) {
+    return new Promise(resolve => {
+        if(moveFactor > 5 || moveFactor <= 0) {
+            throw new Error("moveFactor在1~5之間")
         }
-        start = !start ? curTime : start
-        let progress = curTime - start
-
-        if(direct === "y") {
-            if(curTime < pos) {
-                scrollElement.scrollTo(0,((pos-curPos)*progress / time)+curPos)
-            } else {
-                scrollElement.scrollTo(0,curPos - ((curPos - pos)*progress / time))
+        const scrollElement = document.getElementById(scorllElId)
+        if(!scrollElement) return
+    
+        let curPos = direct === "y" ?  scrollElement.scrollTop : scrollElement.scrollLeft
+        let start: null|number = null
+        let pos = targetHeight
+        let time = Math.abs(targetHeight - curPos) / moveFactor
+        let raf:ReturnType<typeof requestAnimationFrame>
+    
+        moveInfo.isMoving = true
+        raf = window.requestAnimationFrame(function step(curTime) {
+            if(moveInfo.endScroll) {
+                moveInfo.endScroll = false
+                moveInfo.isMoving = false
+                cancelAnimationFrame(raf)
+                return
             }
-        } else {
-            if(curTime < pos) {
-                scrollElement.scrollTo(((pos-curPos)*progress / time)+curPos,0)
-            } else {
-                scrollElement.scrollTo(curPos - ((curPos - pos)*progress / time),0)
-            }
-        }
-
-        if(progress < time) {
-            window.requestAnimationFrame(step)
-        } else {
+            start = !start ? curTime : start
+            let progress = curTime - start
+    
             if(direct === "y") {
-                scrollElement.scrollTo(0,pos)
+                if(curTime < pos) {
+                    scrollElement.scrollTo(0,((pos-curPos)*progress / time)+curPos)
+                } else {
+                    scrollElement.scrollTo(0,curPos - ((curPos - pos)*progress / time))
+                }
             } else {
-                scrollElement.scrollTo(pos,0)
+                if(curTime < pos) {
+                    scrollElement.scrollTo(((pos-curPos)*progress / time)+curPos,0)
+                } else {
+                    scrollElement.scrollTo(curPos - ((curPos - pos)*progress / time),0)
+                }
             }
-            moveInfo.isMoving = false
-        }
+    
+            if(progress < time) {
+                window.requestAnimationFrame(step)
+            } else {
+                if(direct === "y") {
+                    scrollElement.scrollTo(0,pos)
+                } else {
+                    scrollElement.scrollTo(pos,0)
+                }
+                moveInfo.isMoving = false
+                resolve('')
+            }
+        })
     })
 }
 // ############## type  ############## //
