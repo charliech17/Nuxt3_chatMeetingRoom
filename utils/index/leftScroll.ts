@@ -95,7 +95,6 @@ function detectMobileScroll() {
 }
 
 function handleTouchStart(evt: TouchEvent) {
-    evt.preventDefault()
     moveInfo.endScroll = true
     txs = evt.touches[0].clientX
     tys = evt.touches[0].clientY
@@ -111,7 +110,6 @@ function removeTouchEvtFuc() {
 }
 
 function handleTouchMove(evt: TouchEvent) {
-    evt.preventDefault()
     txe = evt.touches[0].clientX
     tye = evt.touches[0].clientY
     txs = txe, tys = tye
@@ -136,20 +134,18 @@ async function handleTouchEnd(evt: TouchEvent) {
         
         if(teact_part!.scrollLeft >= (teact_part!.scrollWidth - teact_part!.clientWidth - 10) && sign < 0) {
             // 往下滑離處理
-            evt.preventDefault()
             isInTeach = false
             removeTouchEvtFuc()
             teact_part!.scrollLeft = teact_part!.scrollWidth - teact_part!.clientWidth
-            const newScollY = scrollSection!.scrollTop + (teact_part_wrapper!.getBoundingClientRect().bottom - calHeaderHeight())
+            const newScollY = scrollSection!.scrollTop + (teact_part_wrapper!.getBoundingClientRect().bottom * 0.8 - calHeaderHeight())
             await smoothScroll(newScollY,"mainContent_scrollSection_ID",1.5)
             scrollSection!.style.overflow = ""
         } else if(teact_part!.scrollLeft <= 10 && sign > 0) {
             // 往上滑離處理
-            evt.preventDefault()
             isInTeach = false
             removeTouchEvtFuc()
             teact_part!.scrollLeft = 0
-            const newScollY = scrollSection!.scrollTop + teact_part_wrapper!.getBoundingClientRect().top - teact_part!.clientHeight - calHeaderHeight()
+            const newScollY = scrollSection!.scrollTop + teact_part_wrapper!.getBoundingClientRect().top - teact_part!.clientHeight * 0.8 - calHeaderHeight()
             await smoothScroll(newScollY,"mainContent_scrollSection_ID",1.5)
             scrollSection!.style.overflow = ""
         } else{
