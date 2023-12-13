@@ -95,6 +95,7 @@ function detectMobileScroll() {
 }
 
 function handleTouchStart(evt: TouchEvent) {
+    evt.preventDefault()
     moveInfo.endScroll = true
     txs = evt.touches[0].clientX
     tys = evt.touches[0].clientY
@@ -110,6 +111,7 @@ function removeTouchEvtFuc() {
 }
 
 function handleTouchMove(evt: TouchEvent) {
+    evt.preventDefault()
     txe = evt.touches[0].clientX
     tye = evt.touches[0].clientY
     txs = txe, tys = tye
@@ -120,7 +122,7 @@ async function handleTouchEnd(evt: TouchEvent) {
     if(!isInTeach) {
         window.removeEventListener("touchend",handleTouchEnd)
     } else {
-        moveInfo.endScroll = true
+        moveInfo.endScroll = false
         let diff = (tye - tiys)
         let sign = diff < 0 ? -1 : 1
         let newSL = teact_part!.scrollLeft - diff
@@ -134,18 +136,22 @@ async function handleTouchEnd(evt: TouchEvent) {
         
         if(teact_part!.scrollLeft >= (teact_part!.scrollWidth - teact_part!.clientWidth - 10) && sign < 0) {
             // 往下滑離處理
+            evt.preventDefault()
             isInTeach = false
             removeTouchEvtFuc()
             teact_part!.scrollLeft = teact_part!.scrollWidth - teact_part!.clientWidth
-            const newScollY = scrollSection!.scrollTop + (teact_part_wrapper!.getBoundingClientRect().bottom * 0.8)
+            const newScollY = scrollSection!.scrollTop + (teact_part_wrapper!.getBoundingClientRect().bottom - calHeaderHeight())
             await smoothScroll(newScollY,"mainContent_scrollSection_ID",1.5)
+            scrollSection!.style.overflow = ""
         } else if(teact_part!.scrollLeft <= 10 && sign > 0) {
             // 往上滑離處理
+            evt.preventDefault()
             isInTeach = false
             removeTouchEvtFuc()
             teact_part!.scrollLeft = 0
-            const newScollY = scrollSection!.scrollTop + teact_part_wrapper!.getBoundingClientRect().top - teact_part!.clientHeight * 0.8 - calHeaderHeight()
+            const newScollY = scrollSection!.scrollTop + teact_part_wrapper!.getBoundingClientRect().top - teact_part!.clientHeight - calHeaderHeight()
             await smoothScroll(newScollY,"mainContent_scrollSection_ID",1.5)
+            scrollSection!.style.overflow = ""
         } else{
             // 修正垂直滾軸
             const scrollRatio = Math.abs(
@@ -161,9 +167,8 @@ async function handleTouchEnd(evt: TouchEvent) {
                     - calHeaderHeight()
                     + teact_part_wrapper!.clientHeight * scrollRatio
                 )
+            scrollSection!.style.overflow = ""
         }
-
-        scrollSection!.style.overflow = ""
     }
 }
 
