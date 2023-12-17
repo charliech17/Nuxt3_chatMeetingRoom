@@ -182,4 +182,9 @@ export async function smoothScroll(targetHeight:number,scorllElId:string,moveFac
         })
     })
 }
+
+export function getScrollPosition() {
+    const scrollSection = document.getElementById('mainContent_scrollSection_ID')
+    return scrollSection!.scrollTop
+}
 // ############## type  ############## //

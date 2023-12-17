@@ -75,7 +75,19 @@ const handleMenuDraweItems = async (triggerItems: 'room' | 'education' | 'sponse
         case 'education':
             emit("changeShowDrawer",false)
             // TODO 導至教學頁面
-            alert('敬請期待')
+            if(useRouter().currentRoute.value.name === "index") {
+                scrollToEducation()
+            } else {
+                navigateTo("/")
+                setTimeout(()=> {
+                    scrollToEducation()
+                },200)
+            }
+            function scrollToEducation() {
+                const teach_part_wrapper = document.getElementById("teach_part_wrapper")!
+                const toPosition = getScrollPosition() + teach_part_wrapper.getBoundingClientRect().top - calHeaderHeight()
+                smoothScroll(toPosition,"mainContent_scrollSection_ID")
+            }
             break
         case 'sponser':
             emit("changeShowDrawer",false)

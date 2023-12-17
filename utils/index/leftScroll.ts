@@ -3,7 +3,7 @@ import { calHeaderHeight } from "@/utils/baseUtils"
 
 let scrollSection: null| HTMLElement;
 let teact_part: null| HTMLElement;
-let teact_part_wrapper: null| HTMLElement;
+let teach_part_wrapper: null| HTMLElement;
 let teach_img: null| HTMLElement;
 let isInTeach = false
 let headerHeightMargin = 0;
@@ -21,7 +21,7 @@ function handleScroll() {
 }
 
 function judgeScrollInside(removeEvtFuc: Function) {
-    if( teact_part_wrapper!.getBoundingClientRect().top <= calHeaderHeight() 
+    if( teach_part_wrapper!.getBoundingClientRect().top <= calHeaderHeight() 
         && teach_img!.getBoundingClientRect().bottom >= (
             calHeaderHeight() 
             + teach_img!.clientHeight
@@ -63,12 +63,12 @@ function judgeMoveDirection(isMoveForward: boolean,handleFunc: Function, scollSp
     diff = Math.pow(Math.abs(diff),0.8) * direct
 
     if(teact_part!.scrollLeft >= (teact_part!.scrollWidth - teact_part!.clientWidth - 10) && direct > 0) {
-        const newScollY = scrollSection!.scrollTop + teact_part_wrapper!.getBoundingClientRect().bottom - calHeaderHeight()
+        const newScollY = scrollSection!.scrollTop + teach_part_wrapper!.getBoundingClientRect().bottom - calHeaderHeight()
         smoothScroll(newScollY,"mainContent_scrollSection_ID",3)
         isInTeach = false
         handleFunc(isMoveForward)
     } else if (teact_part!.scrollLeft <= 2 && direct < 0) {
-        const newScollY = scrollSection!.scrollTop + teact_part_wrapper!.getBoundingClientRect().top - teact_part!.clientHeight
+        const newScollY = scrollSection!.scrollTop + teach_part_wrapper!.getBoundingClientRect().top - teact_part!.clientHeight
         smoothScroll(newScollY,"mainContent_scrollSection_ID",3)
         isInTeach = false
         handleFunc(isMoveForward)
@@ -137,7 +137,7 @@ async function handleTouchEnd(evt: TouchEvent) {
             isInTeach = false
             removeTouchEvtFuc()
             teact_part!.scrollLeft = teact_part!.scrollWidth - teact_part!.clientWidth
-            const newScollY = scrollSection!.scrollTop + (teact_part_wrapper!.getBoundingClientRect().bottom * 0.8 - calHeaderHeight())
+            const newScollY = scrollSection!.scrollTop + (teach_part_wrapper!.getBoundingClientRect().bottom * 0.8 - calHeaderHeight())
             await smoothScroll(newScollY,"mainContent_scrollSection_ID",1.5)
             scrollSection!.style.overflow = ""
         } else if(teact_part!.scrollLeft <= 10 && sign > 0) {
@@ -145,7 +145,7 @@ async function handleTouchEnd(evt: TouchEvent) {
             isInTeach = false
             removeTouchEvtFuc()
             teact_part!.scrollLeft = 0
-            const newScollY = scrollSection!.scrollTop + teact_part_wrapper!.getBoundingClientRect().top - teact_part!.clientHeight * 0.8 - calHeaderHeight()
+            const newScollY = scrollSection!.scrollTop + teach_part_wrapper!.getBoundingClientRect().top - teact_part!.clientHeight * 0.8 - calHeaderHeight()
             await smoothScroll(newScollY,"mainContent_scrollSection_ID",1.5)
             scrollSection!.style.overflow = ""
         } else{
@@ -159,9 +159,9 @@ async function handleTouchEnd(evt: TouchEvent) {
             )
             scrollSection!.scrollTop = ( 
                     scrollSection!.scrollTop 
-                    + teact_part_wrapper!.getBoundingClientRect().top 
+                    + teach_part_wrapper!.getBoundingClientRect().top 
                     - calHeaderHeight()
-                    + teact_part_wrapper!.clientHeight * scrollRatio
+                    + teach_part_wrapper!.clientHeight * scrollRatio
                 )
             scrollSection!.style.overflow = ""
         }
@@ -171,7 +171,7 @@ async function handleTouchEnd(evt: TouchEvent) {
 export function initTeachPart() {
     scrollSection = document.getElementById('mainContent_scrollSection_ID')
     teact_part = document.getElementById("teact_part")!
-    teact_part_wrapper = document.getElementById("teact_part_wrapper")!
+    teach_part_wrapper = document.getElementById("teach_part_wrapper")!
     teach_img = document.getElementById("teach_img")!
     headerHeightMargin = calHeaderHeight() + 16
     

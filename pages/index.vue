@@ -43,7 +43,7 @@
                         <p class="mt-2">{{ parameter.contentTxt }}</p>
                     </div>
                 </div>
-                <div class="mt-20" ref="teact_part_wrapper" id="teact_part_wrapper">
+                <div class="mt-20" ref="teach_part_wrapper" id="teach_part_wrapper">
                     <div ref="teact_part" id="teact_part">
                         <h2 class="text-center text-2xl" ref="teach_part_title">步驟教學</h2>
                         <div class="mt-4">
@@ -120,7 +120,7 @@
     const teach_img = ref<HTMLElement|null>(null)
     const teact_part = ref<HTMLElement|null>(null)
     const teach_part_title = ref<HTMLElement|null>(null)
-    const teact_part_wrapper = ref<HTMLElement|null>(null)
+    const teach_part_wrapper = ref<HTMLElement|null>(null)
     const menu = ref(false)
     const moodItems = ref([
         {icon:"👍",isSelect: false, id: "thumb_up",count:0},
@@ -201,7 +201,7 @@
 
     function handleLoadImg(evt:Event) {
         if(!isMobile) return
-        teact_part_wrapper.value!.style.height = `${(teact_part.value!.clientHeight) + teach_img.value!.scrollWidth}px`
+        teach_part_wrapper.value!.style.height = `${(teact_part.value!.clientHeight) + teach_img.value!.scrollWidth}px`
         teact_part.value!.style.position = "sticky"
         teact_part.value!.style.top = `0%`
         teach_part_title.value?.classList.add("sticky-title")

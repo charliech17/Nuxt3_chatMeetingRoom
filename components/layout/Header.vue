@@ -130,29 +130,6 @@ const logoutUser = async () => {
     useRouter().replace('/')
 }
 
-
-const handleMenuDraweItems = async (triggerItems: 'room' | 'education' | 'sponser' | 'changeColor' ) => {
-    switch(triggerItems) {
-        case 'changeColor':
-            use_deviceInfo_Store().changeSystemColor()
-            isShowDrawer.value = false
-            break
-        case 'room' :
-            navigateTo('/room')
-            isShowDrawer.value = false
-            break
-        case 'education':
-            isShowDrawer.value = false
-            // TODO 導至教學頁面
-            alert('敬請期待')
-            break
-        case 'sponser':
-            isShowDrawer.value = false
-            navigateTo('/donation')
-            break
-    }
-}
-
 </script>
 
 <style lang="scss">
