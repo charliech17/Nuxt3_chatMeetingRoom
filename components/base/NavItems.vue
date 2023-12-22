@@ -65,8 +65,12 @@ const listInfo = ref([
 const handleMenuDraweItems = async (triggerItems: 'room' | 'education' | 'sponser' | 'tryVedioCall' ) => {
     switch(triggerItems) {
         case 'tryVedioCall':
-            navigateTo("https://webrtc-chatroom.netlify.app/",{external: true})
             emit("changeShowDrawer",false)
+            apiService(()=> {
+                return new Promise(()=> {
+                    navigateTo("https://webrtc-chatroom.netlify.app/",{external: true})
+                })
+            })
             break
         case 'room' :
             navigateTo('/room')

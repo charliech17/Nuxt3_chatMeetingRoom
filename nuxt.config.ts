@@ -2,6 +2,18 @@
 import vuetify from 'vite-plugin-vuetify';
 
 export default defineNuxtConfig({
+    app: {
+        head: {
+            title: `chatApp即時視訊網站`,
+            link: [
+                {
+                    rel: 'icon',
+                    type: 'image/png',
+                    href: '/online-meeting.png'
+                }
+            ],
+        },
+    },
     modules: [
         '@nuxtjs/tailwindcss',
         '@pinia/nuxt',
