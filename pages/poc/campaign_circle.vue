@@ -17,34 +17,32 @@
 </template>
 
 <script setup lang="ts">
-import { VNodeRef } from 'nuxt/dist/app/compat/capi';
-
-    const circleRef = ref<VNodeRef|null>(null)
-    const resultMarkRef = ref<VNodeRef|null>(null)
+    const circleRef = ref<HTMLDivElement|null>(null)
+    const resultMarkRef = ref<HTMLDivElement|null>(null)
     const startRotate = () => {
-        const isRotate = circleRef.value.classList.contains('animate_rotate')
+        const isRotate = circleRef.value!.classList.contains('animate_rotate')
         if(isRotate) {
             const stopDeg = Math.random() * 1000 % 360
             if(stopDeg < 45  || stopDeg > 315) {
-                resultMarkRef.value.style.transform = `rotate(-45deg)`
+                resultMarkRef.value!.style.transform = `rotate(-45deg)`
             }
             if(stopDeg > 45  && stopDeg < 135) {
-                resultMarkRef.value.style.transform = `rotate(225deg)`
+                resultMarkRef.value!.style.transform = `rotate(225deg)`
             }
             if(stopDeg > 135  && stopDeg < 225) {
-                resultMarkRef.value.style.transform = `rotate(135deg)`
+                resultMarkRef.value!.style.transform = `rotate(135deg)`
             }
             if(stopDeg > 225  && stopDeg < 315) {
-                resultMarkRef.value.style.transform = `rotate(45deg)`
+                resultMarkRef.value!.style.transform = `rotate(45deg)`
             }
 
-            resultMarkRef.value.style.display = 'block'
-            circleRef.value.style.transform = `rotate(${stopDeg}deg)`
-            circleRef.value.classList.remove('animate_rotate')
+            resultMarkRef.value!.style.display = 'block'
+            circleRef.value!.style.transform = `rotate(${stopDeg}deg)`
+            circleRef.value!.classList.remove('animate_rotate')
         } else if(!isRotate) {
-            resultMarkRef.value.style.display = 'none'
-            circleRef.value.style.transform = ''
-            circleRef.value.classList.add('animate_rotate')
+            resultMarkRef.value!.style.display = 'none'
+            circleRef.value!.style.transform = ''
+            circleRef.value!.classList.add('animate_rotate')
         }
     }
 </script>
